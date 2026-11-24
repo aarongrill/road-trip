@@ -2,7 +2,7 @@
 // - App files: network first (so updates show up right away), saved copy when offline.
 // - Leaflet and fonts: saved copy first.
 // - Map tiles: saved as you view them (never bulk-downloaded, per OpenStreetMap's tile policy).
-const VERSION = "rt27-v15";
+const VERSION = "rt27-v16";
 const APP = VERSION + "-app";
 const TILES = "rt27-tiles";
 const MAX_TILES = 3000;

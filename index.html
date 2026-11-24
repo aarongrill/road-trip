@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#2F5D3A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Road Trip 2027</title>
-<!-- App version 15 -->
+<!-- App version 16 -->
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -440,9 +440,9 @@
   <div class="sheet-body" id="sheetBody"></div>
 </section>
 
-<script src="config.js?v=15"></script>
-<script src="data.js?v=15"></script>
-<script src="route-geometry.js?v=15" onerror="window.ROUTE_GEOMETRY = null"></script>
+<script src="config.js?v=16"></script>
+<script src="data.js?v=16"></script>
+<script src="route-geometry.js?v=16" onerror="window.ROUTE_GEOMETRY = null"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function () {
@@ -464,10 +464,10 @@
   let shared = false;                         // true when Firebase sync is on
   const IDEAS = T.ideas || [];
   const IDEA = Object.fromEntries(IDEAS.map(x => [x.id, x]));
-  const ICAT = { eat: { label: "Fun place to eat", icon: "🍴" }, odd: { label: "Odd stop", icon: "🤪" }, view: { label: "View or rest stop", icon: "🏞️" }, swim: { label: "Swim stop", icon: "🏊" } };
+  const ICAT = { eat: { label: "Fun place to eat", icon: "🍴" }, odd: { label: "Odd stop", icon: "🤪" }, view: { label: "View or rest stop", icon: "🏞️" }, swim: { label: "Swim stop", icon: "🏊" }, park: { label: "National park site", icon: "🌲" }, ride: { label: "Ride", icon: "🚵" } };
   let done = store.get("done", {});           // visited marks
   // Navigation filter shared by Map, List, and Ideas
-  const NAV = [["all", "All"], ["eat", "🍴 Food"], ["see", "🎡 Attractions"], ["ride", "🚵 Biking"], ["swim", "🏊 Swimming"], ["view", "🏞️ Views & rest stops"], ["sleep", "🛏️ Sleep"]];
+  const NAV = [["all", "All"], ["eat", "🍴 Food"], ["see", "🎡 Attractions"], ["ride", "🚵 Biking"], ["swim", "🏊 Swimming"], ["view", "🏞️ Views & rest stops"], ["park", "🌲 Parks"], ["sleep", "🛏️ Sleep"]];
   let navCat = store.get("navcat", "all");
   let showIdeas = store.get("showIdeas", true);
 
@@ -588,6 +588,7 @@
     });
   }
   // Which filter categories an item belongs to (an item can be in more than one)
+  const PARKRX = /national park|national monument|yellowstone|grand teton|old faithful|oxbow|black canyon|badlands|rushmore/i;
   const SWIMRX = /water ?park|beach|swim|hot spring|noah|kalahari|wilderness resort/i;
   function catsOf(id) {
     const c = new Set();
@@ -598,12 +599,14 @@
       else if (p.type === "fun") c.add("see");
       else c.add("sleep");
       if (id === "rafting" || SWIMRX.test(p.name + " " + (p.note || ""))) c.add("swim");
+      if (PARKRX.test(p.name)) c.add("park");
     } else if (IDEA[id]) {
       const k = IDEA[id].cat; c.add(k === "eat" ? "eat" : k === "odd" ? "see" : k);
     } else {
       const sp = mine.find(x => x.id === id);
       const m = sp && { meal: "eat", fun: "see", ride: "ride", stay: "sleep", swim: "swim", view: "view" }[sp.cat];
       if (m) c.add(m);
+      if (sp && (sp.park || PARKRX.test(sp.name))) c.add("park");
     }
     return c;
   }
@@ -853,7 +856,7 @@
         <h3 class="section-title">My spots (${mine.length})</h3>
         ${mine.length ? `<ul class="stops">${mine.map(s => stopItem(s.id, s.day === null || s.day === undefined ? (MY_CATS[s.cat] || MY_CATS.note).label : `Day ${s.day + 1} · ${(MY_CATS[s.cat] || MY_CATS.note).label}`)).join("")}</ul>`
           : `<p class="fineprint">Nothing added yet. Tap “+ Add a spot” to drop a pin anywhere on the map.</p>`}
-        <p class="fineprint">App version 15 (route options, builder, explore)</p>
+        <p class="fineprint">App version 16 (national parks)</p>
         <h3 class="section-title">Share my spots</h3>
         <p class="fineprint">Spots are saved on this phone. To share them, export a file and import it on another phone.</p>
         <div class="btnrow">
@@ -1070,8 +1073,8 @@
   function addIdeaToPlan(id) {
     const x = IDEA[id]; const sid = "i_" + id;
     if (mine.some(s => s.id === sid)) return;
-    const cat = x.cat === "eat" ? "meal" : x.cat === "view" ? "view" : x.cat === "swim" ? "swim" : "fun";
-    const rec = { id: sid, name: x.name, cat, day: x.day, note: `${x.note} (${x.detour})`, lat: x.lat, lng: x.lng };
+    const cat = x.cat === "eat" ? "meal" : x.cat === "view" ? "view" : x.cat === "swim" ? "swim" : x.cat === "ride" ? "ride" : "fun";
+    const rec = { id: sid, name: x.name, cat, day: x.day, note: `${x.note} (${x.detour})`, lat: x.lat, lng: x.lng, park: x.cat === "park" || undefined };
     mine.push(rec); saveMine(); syncSpot(rec); refreshAll();
   }
   const inPlan = id => mine.some(s => s.id === "i_" + id);
@@ -2032,6 +2035,6 @@
   if (mode === "list" && startDay !== null) scrollToDay(startDay);
 })();
 </script>
-<script type="module" src="sync.js?v=15"></script>
+<script type="module" src="sync.js?v=16"></script>
 </body>
 </html>
