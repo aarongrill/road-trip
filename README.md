@@ -16,7 +16,7 @@ A phone-friendly companion app for our July 2027 mountain bike road trip. Switch
 - During the trip, today is highlighted and opens automatically.
 
 **Ideas**
-- Researched options along the route: fun places to eat, odd roadside stops, and views and rest stops, each with the day it fits, the detour, and details.
+- Researched options along the route: fun places to eat, odd roadside stops, views and rest stops, and swim stops (water parks, pools, swimming holes, lakes, and hot springs), each with the day it fits, the detour, and details.
 - Tap 👍 to vote. The first time, the app asks your name so everyone can see who voted for what.
 - Sort by trip order or most votes, and filter by type.
 - "Add to plan" puts an idea into that day's list and onto the map.

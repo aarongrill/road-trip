@@ -235,9 +235,9 @@
   <div class="sheet-body" id="sheetBody"></div>
 </section>
 
-<script src="config.js?v=5"></script>
-<script src="data.js?v=5"></script>
-<script src="route-geometry.js?v=5" onerror="window.ROUTE_GEOMETRY = null"></script>
+<script src="config.js?v=7"></script>
+<script src="data.js?v=7"></script>
+<script src="route-geometry.js?v=7" onerror="window.ROUTE_GEOMETRY = null"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function () {
@@ -259,7 +259,7 @@
   let shared = false;                         // true when Firebase sync is on
   const IDEAS = T.ideas || [];
   const IDEA = Object.fromEntries(IDEAS.map(x => [x.id, x]));
-  const ICAT = { eat: { label: "Fun place to eat", icon: "🍴" }, odd: { label: "Odd stop", icon: "🤪" }, view: { label: "View or rest stop", icon: "🏞️" } };
+  const ICAT = { eat: { label: "Fun place to eat", icon: "🍴" }, odd: { label: "Odd stop", icon: "🤪" }, view: { label: "View or rest stop", icon: "🏞️" }, swim: { label: "Swim stop", icon: "🏊" } };
   let done = store.get("done", {});           // visited marks
   let filters = store.get("filters2", { stay: true, ride: true, fun: true, meal: true, mine: true });
   if (filters.ideas === undefined) filters.ideas = true;
@@ -288,6 +288,7 @@
     stay: { label: "Place to sleep", icon: "⛺" },
     gas: { label: "Gas or supplies", icon: "⛽" },
     view: { label: "View or rest stop", icon: "🏞️" },
+    swim: { label: "Swim", icon: "🏊" },
     note: { label: "Note", icon: "📝" }
   };
   const GROUPS = {
@@ -678,7 +679,7 @@
   function addIdeaToPlan(id) {
     const x = IDEA[id]; const sid = "i_" + id;
     if (mine.some(s => s.id === sid)) return;
-    const cat = x.cat === "eat" ? "meal" : x.cat === "view" ? "view" : "fun";
+    const cat = x.cat === "eat" ? "meal" : x.cat === "view" ? "view" : x.cat === "swim" ? "swim" : "fun";
     const rec = { id: sid, name: x.name, cat, day: x.day, note: `${x.note} (${x.detour})`, lat: x.lat, lng: x.lng };
     mine.push(rec); saveMine(); syncSpot(rec); refreshAll();
   }
@@ -713,7 +714,7 @@
         <input id="voterInput" maxlength="30" placeholder="Your name" value="${esc(voterName)}">
         <button class="btn" id="saveVoter">Save name</button></div>
       <div class="ideasbar" role="group" aria-label="Filter ideas">
-        ${[["all", "All"], ["eat", "🍴 Eats"], ["odd", "🤪 Odd stops"], ["view", "🏞️ Views and rest stops"]].map(([k, l]) =>
+        ${[["all", "All"], ["eat", "🍴 Eats"], ["odd", "🤪 Odd stops"], ["view", "🏞️ Views and rest stops"], ["swim", "🏊 Swim"]].map(([k, l]) =>
           `<button class="btn" data-ifilter="${k}" aria-pressed="${ideaFilter === k}">${l}</button>`).join("")}
         <select id="ideaSort" aria-label="Sort ideas">
           <option value="trip" ${ideaSort === "trip" ? "selected" : ""}>Trip order</option>
@@ -922,6 +923,6 @@
   if (mode === "list" && startDay !== null) scrollToDay(startDay);
 })();
 </script>
-<script type="module" src="sync.js?v=5"></script>
+<script type="module" src="sync.js?v=7"></script>
 </body>
 </html>
