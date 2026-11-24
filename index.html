@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#2F5D3A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Road Trip 2027</title>
-<!-- App version 16 -->
+<!-- App version 18 -->
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -440,9 +440,9 @@
   <div class="sheet-body" id="sheetBody"></div>
 </section>
 
-<script src="config.js?v=16"></script>
-<script src="data.js?v=16"></script>
-<script src="route-geometry.js?v=16" onerror="window.ROUTE_GEOMETRY = null"></script>
+<script src="config.js?v=18"></script>
+<script src="data.js?v=18"></script>
+<script src="route-geometry.js?v=18" onerror="window.ROUTE_GEOMETRY = null"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function () {
@@ -464,10 +464,10 @@
   let shared = false;                         // true when Firebase sync is on
   const IDEAS = T.ideas || [];
   const IDEA = Object.fromEntries(IDEAS.map(x => [x.id, x]));
-  const ICAT = { eat: { label: "Fun place to eat", icon: "🍴" }, odd: { label: "Odd stop", icon: "🤪" }, view: { label: "View or rest stop", icon: "🏞️" }, swim: { label: "Swim stop", icon: "🏊" }, park: { label: "National park site", icon: "🌲" }, ride: { label: "Ride", icon: "🚵" } };
+  const ICAT = { eat: { label: "Fun place to eat", icon: "🍴" }, odd: { label: "Odd stop", icon: "🤪" }, view: { label: "View or rest stop", icon: "🏞️" }, swim: { label: "Swim stop", icon: "🏊" }, park: { label: "National park site", icon: "🌲" }, ride: { label: "Ride", icon: "🚵" }, outdoor: { label: "Outdoor activity", icon: "🧗" } };
   let done = store.get("done", {});           // visited marks
   // Navigation filter shared by Map, List, and Ideas
-  const NAV = [["all", "All"], ["eat", "🍴 Food"], ["see", "🎡 Attractions"], ["ride", "🚵 Biking"], ["swim", "🏊 Swimming"], ["view", "🏞️ Views & rest stops"], ["park", "🌲 Parks"], ["sleep", "🛏️ Sleep"]];
+  const NAV = [["all", "All"], ["eat", "🍴 Food"], ["see", "🎡 Attractions"], ["ride", "🚵 Biking"], ["swim", "🏊 Swimming"], ["view", "🏞️ Views & rest stops"], ["park", "🌲 Parks"], ["outdoor", "🧗 Outdoors"], ["sleep", "🛏️ Sleep"]];
   let navCat = store.get("navcat", "all");
   let showIdeas = store.get("showIdeas", true);
 
@@ -602,6 +602,7 @@
       if (PARKRX.test(p.name)) c.add("park");
     } else if (IDEA[id]) {
       const k = IDEA[id].cat; c.add(k === "eat" ? "eat" : k === "odd" ? "see" : k);
+      if (k === "outdoor" && /swim|paddle|lake|rafting|whitewater|float/i.test(IDEA[id].name)) c.add("swim");
     } else {
       const sp = mine.find(x => x.id === id);
       const m = sp && { meal: "eat", fun: "see", ride: "ride", stay: "sleep", swim: "swim", view: "view" }[sp.cat];
@@ -856,7 +857,7 @@
         <h3 class="section-title">My spots (${mine.length})</h3>
         ${mine.length ? `<ul class="stops">${mine.map(s => stopItem(s.id, s.day === null || s.day === undefined ? (MY_CATS[s.cat] || MY_CATS.note).label : `Day ${s.day + 1} · ${(MY_CATS[s.cat] || MY_CATS.note).label}`)).join("")}</ul>`
           : `<p class="fineprint">Nothing added yet. Tap “+ Add a spot” to drop a pin anywhere on the map.</p>`}
-        <p class="fineprint">App version 16 (national parks)</p>
+        <p class="fineprint">App version 18 (outdoor activities)</p>
         <h3 class="section-title">Share my spots</h3>
         <p class="fineprint">Spots are saved on this phone. To share them, export a file and import it on another phone.</p>
         <div class="btnrow">
@@ -1073,7 +1074,7 @@
   function addIdeaToPlan(id) {
     const x = IDEA[id]; const sid = "i_" + id;
     if (mine.some(s => s.id === sid)) return;
-    const cat = x.cat === "eat" ? "meal" : x.cat === "view" ? "view" : x.cat === "swim" ? "swim" : x.cat === "ride" ? "ride" : "fun";
+    const cat = x.cat === "eat" ? "meal" : x.cat === "view" ? "view" : x.cat === "swim" ? "swim" : x.cat === "ride" ? "ride" : x.cat === "outdoor" ? "fun" : "fun";
     const rec = { id: sid, name: x.name, cat, day: x.day, note: `${x.note} (${x.detour})`, lat: x.lat, lng: x.lng, park: x.cat === "park" || undefined };
     mine.push(rec); saveMine(); syncSpot(rec); refreshAll();
   }
@@ -1430,7 +1431,8 @@
   function altCard(a, isUser) {
     const st = altStats(a), r = st.rep;
     const dropped = [];
-    for (let i = r.from; i <= r.to; i++) { const d = T.days[i]; if (d.stay && P[d.stay] && P[d.stay].type !== "home") dropped.push(P[d.stay].name); }
+    const kept = new Set(st.days.map(d => d.stay.name));
+    for (let i = r.from; i <= r.to; i++) { const d = T.days[i]; if (d.stay && P[d.stay] && P[d.stay].type !== "home" && !kept.has(P[d.stay].name) && !dropped.includes(P[d.stay].name)) dropped.push(P[d.stay].name); }
     const daysHTML = st.days.map(d => `<div class="altday"><div class="t">${longDate(d.date)}: ${esc(d.title)}</div>
         ${d.drive ? `<div class="${hrs(d.drive.hours) >= 8 ? "warn" : "fineprint"}">🚗 ${esc(d.drive.from)} to ${esc(d.drive.to)}, ${d.drive.miles} mi, about ${d.drive.hours} hrs${d.drive.est ? " (estimate)" : ""}${hrs(d.drive.hours) >= 8 ? " ⚠️ long day" : ""}</div>` : ""}
         ${d.note ? `<div class="fineprint">${esc(d.note)}</div>` : ""}
@@ -1616,8 +1618,14 @@
     let n = 0;
     for (const d of days) {
       if (d.drive) {
-        const leg = await legInfo(prev, d.stay);
-        L.polyline(leg.geom || [[prev.lat, prev.lng], [d.stay.lat, d.stay.lng]], { color: "#7B3FA0", weight: 5, opacity: 0.85, dashArray: leg.geom ? null : "8 8" }).addTo(altLayer);
+        // route through the day's stops in order, so loop days (out and back) still draw
+        const chain = [prev, ...(d.stops || []).filter(x => x.lat), d.stay];
+        for (let k = 0; k < chain.length - 1; k++) {
+          const a2 = chain[k], b2 = chain[k + 1];
+          if (Math.abs(a2.lat - b2.lat) + Math.abs(a2.lng - b2.lng) < 0.001) continue;
+          const leg = await legInfo(a2, b2);
+          L.polyline(leg.geom || [[a2.lat, a2.lng], [b2.lat, b2.lng]], { color: "#7B3FA0", weight: 5, opacity: 0.85, dashArray: leg.geom ? null : "8 8" }).addTo(altLayer);
+        }
         n++;
         L.marker([d.stay.lat, d.stay.lng], { icon: L.divIcon({ className: "", html: `<div class="altpin">${n}</div>`, iconSize: [26, 26], iconAnchor: [13, 13] }) })
           .bindTooltip(`${esc(d.stay.name)} · ${longDate(d.date)}`).addTo(altLayer);
@@ -1651,7 +1659,7 @@
     sleep: ['nwr["tourism"~"^(camp_site|hotel|motel)$"]["name"]']
   };
   const XR = { eat: 3000, see: 20000, swim: 20000, view: 20000, ride: 30000, sleep: 15000 };
-  const XICON = { eat: "🍴", see: "🎡", swim: "🏊", view: "🏞️", ride: "🚵", sleep: "🛏️" };
+  const XICON = { eat: "🍴", see: "🎡", swim: "🏊", view: "🏞️", ride: "🚵", sleep: "🛏️", park: "🌲", outdoor: "🧗" };
   const XLABEL = { eat: "Food", see: "Attractions", swim: "Swimming", view: "Views", ride: "Biking", sleep: "Sleep" };
   function legPoints(n) {
     const stg = STAGES[n], pts = [];
@@ -2035,6 +2043,6 @@
   if (mode === "list" && startDay !== null) scrollToDay(startDay);
 })();
 </script>
-<script type="module" src="sync.js?v=16"></script>
+<script type="module" src="sync.js?v=18"></script>
 </body>
 </html>

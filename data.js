@@ -245,7 +245,40 @@ window.TRIP = {
     { id: "np_littlebighorn", cat: "park", day: 23, name: "Little Bighorn Battlefield National Monument", lat: 45.57, lng: -107.428, detour: "Right off I-90 at Crow Agency", note: "The 1876 battlefield, with a short driving tour; a good break on the long Big Sky to Custer day." },
     { id: "np_windcave", cat: "park", day: 24, name: "Wind Cave National Park", lat: 43.556, lng: -103.478, detour: "Next to Custer State Park", note: "Free to enter, with bison on the prairie above one of the longest caves in the world. Cave tours cost extra and can sell out; check reservations." },
     { id: "np_jewelcave", cat: "park", day: 24, name: "Jewel Cave National Monument", lat: 43.73, lng: -103.829, detour: "About 15 minutes west of Custer", note: "Crystal-lined cave passages; tours cost extra and fill in summer." },
-    { id: "np_minuteman", cat: "park", day: 24, name: "Minuteman Missile National Historic Site", lat: 43.877, lng: -101.998, detour: "I-90 exit 131, by the Badlands", note: "Cold War missile site; the visitor center is free, and you can look down into the Delta-09 missile silo nearby." }
+    { id: "np_minuteman", cat: "park", day: 24, name: "Minuteman Missile National Historic Site", lat: 43.877, lng: -101.998, detour: "I-90 exit 131, by the Badlands", note: "Cold War missile site; the visitor center is free, and you can look down into the Delta-09 missile silo nearby." },
+    { id: "np_canyon", cat: "park", day: 22, name: "Grand Canyon of the Yellowstone: Artist Point", lat: 44.7202, lng: -110.4789, detour: "About 2 hours from Big Sky", note: "Yellow canyon walls and the 308-foot Lower Falls. Pairs with the steep, short Brink of Lower Falls trail." },
+    { id: "np_hayden", cat: "park", day: 22, name: "Hayden Valley, Yellowstone", lat: 44.6461, lng: -110.4614, detour: "South of Canyon Village", note: "Yellowstone’s best wildlife valley for bison, elk, and sometimes bears and wolves. Mornings and evenings are best." },
+    { id: "np_norris", cat: "park", day: 22, name: "Norris Geyser Basin, Yellowstone", lat: 44.7268, lng: -110.7037, detour: "About 1.5 hours from Big Sky", note: "The park’s hottest geyser basin and home of Steamboat, the tallest active geyser in the world." },
+    // Outdoor activities: Jackson Hole, Grand Teton, Yellowstone, Big Sky (cat "outdoor")
+    { id: "jh_tram", cat: "outdoor", day: 20, name: "Jackson Hole Aerial Tram and Grand Teton Skywalk", lat: 43.5875, lng: -110.8279, detour: "Teton Village, 25 minutes from camp", note: "“Big Red” climbs 4,139 vertical feet in about 12 minutes to Rendezvous Mountain, with a viewing platform and hiking at the top. A free shuttle runs from Town Square.", src: "Jackson Hole Mountain Resort" },
+    { id: "jh_viaferrata", cat: "outdoor", day: 20, name: "Via Ferrata at Jackson Hole", lat: 43.59, lng: -110.84, detour: "Teton Village", note: "Guided climbing on cables and ladders, with suspension bridges, high above the valley. Casper Bowl routes for beginners; the harder Corbet’s routes open mid-July. Half-day and full-day trips; book ahead.", src: "Jackson Hole Mountain Resort" },
+    { id: "jh_ropes", cat: "outdoor", day: 20, name: "Teton Village: ropes course and bungee trampoline", lat: 43.5868, lng: -110.8262, detour: "Teton Village", note: "Aerial ropes course and bungee trampoline at the base, plus gondola rides; easy to pair with the tram or bike park.", src: "Jackson Hole Mountain Resort" },
+    { id: "jh_whitewater", cat: "outdoor", day: 19, name: "Snake River Canyon whitewater rafting", lat: 43.212, lng: -110.855, detour: "Canyon south of Jackson; outfitters run vans from town", note: "8 miles of Class II–III rapids like Big Kahuna and Lunch Counter, about 3.5 to 4 hours round trip. Minimum age is usually 6. Easy to fit in on the drive into Jackson, since the canyon is on our route.", src: "Outfitter listings" },
+    { id: "jh_float", cat: "outdoor", day: 20, name: "Snake River scenic float in Grand Teton", lat: 43.758, lng: -110.627, detour: "Deadman’s Bar to Moose", note: "About 10 calm miles in 2 to 3 hours with the Tetons overhead; bald eagles, moose, and otters are common. Guides row. Early morning or evening floats are best for wildlife.", src: "Jackson Hole travel guides" },
+    { id: "jh_snowking", cat: "outdoor", day: 19, name: "Snow King Mountain", lat: 43.471, lng: -110.759, detour: "Walking distance from downtown Jackson", note: "Gondola to the summit for sunset views over town, plus an alpine coaster and ropes course at the base. Check which activities are open." },
+    { id: "jh_rodeo", cat: "odd", day: 20, name: "Jackson Hole Rodeo", lat: 43.474, lng: -110.771, detour: "Teton County Fairgrounds", note: "Bull riding and barrel racing on Wednesday and Saturday nights all summer. Our Jackson nights are Thursday and Friday, so this only works if the plan shifts.", src: "Jackson Hole Mountain Resort" },
+    { id: "jh_shootout", cat: "odd", day: 19, name: "Town Square shootout, Jackson", lat: 43.4799, lng: -110.7624, detour: "Downtown Jackson", note: "Free Old West shootout reenactment at 6 p.m. most evenings except Sundays, next to the antler arches." },
+    { id: "gt_cascade", cat: "outdoor", day: 20, name: "Cascade Canyon hike, Grand Teton", lat: 43.766, lng: -110.76, detour: "From the Jenny Lake boat dock", note: "Continue past Hidden Falls and Inspiration Point into a glacier-carved canyon between the peaks. Turn around whenever you like; moose are common." },
+    { id: "gt_paddle", cat: "outdoor", day: 20, name: "Paddle String Lake and Leigh Lake", lat: 43.7895, lng: -110.731, detour: "String Lake picnic area", note: "Calm, shallow water for kayaks, canoes, and paddleboards right under the peaks. Rent in town; boats need a park permit and an aquatic invasive species inspection." },
+    { id: "gt_colter", cat: "outdoor", day: 21, name: "Colter Bay: kayaks, lake cruises, and horseback", lat: 43.903, lng: -110.64, detour: "On the way north to Yellowstone", note: "Marina with kayak and canoe rentals and scenic cruises on Jackson Lake, plus guided trail rides. Check hours and book rides ahead." },
+    { id: "gt_phelps", cat: "outdoor", day: 20, name: "Phelps Lake and the jumping rock", lat: 43.64, lng: -110.779, detour: "Laurance S. Rockefeller Preserve", note: "Hike to a clear lake with a famous jumping rock. Parking at the preserve is limited; check access, since nearby Death Canyon Road has had closures." },
+    { id: "ys_fairyfalls", cat: "outdoor", day: 21, name: "Fairy Falls hike, Yellowstone", lat: 44.532, lng: -110.872, detour: "Fairy Falls lot, south of Midway Geyser Basin", note: "5.4 miles round trip and nearly flat, past the Grand Prismatic Overlook to a 200-foot waterfall. Closed in spring for bear management.", src: "Visit Bozeman" },
+    { id: "ys_observation", cat: "outdoor", day: 21, name: "Observation Point, above Old Faithful", lat: 44.465, lng: -110.829, detour: "From the Upper Geyser Basin boardwalk", note: "A short climb to a view over the whole geyser basin; time it to watch Old Faithful erupt from above." },
+    { id: "ys_mystic", cat: "outdoor", day: 21, name: "Mystic Falls hike, Yellowstone", lat: 44.488, lng: -110.864, detour: "Near Biscuit Basin", note: "2.4 miles round trip to a 70-foot waterfall. In June 2026 it was closed after a bear incident, and Biscuit Basin has been closed since 2024; check status.", src: "Trail guides" },
+    { id: "ys_storm", cat: "outdoor", day: 22, name: "Storm Point Loop, Yellowstone Lake", lat: 44.56, lng: -110.326, detour: "East of Fishing Bridge", note: "2.3-mile loop through forest to a windy point on Yellowstone Lake, with marmots, bison, and lake beaches.", src: "KOA" },
+    { id: "ys_lakecruise", cat: "outdoor", day: 22, name: "Yellowstone Lake scenic cruise and boat rentals", lat: 44.534, lng: -110.437, detour: "Bridge Bay Marina", note: "One-hour scenic cruise, guided fishing charters, or your own rowboat or motorboat on the biggest high-elevation lake in North America.", src: "Xanterra" },
+    { id: "ys_horse", cat: "outdoor", day: 22, name: "Horseback ride at Canyon Lodge corral", lat: 44.733, lng: -110.489, detour: "Canyon Village", note: "Guided one- and two-hour trail rides; book ahead. Roosevelt also runs stagecoach and covered wagon cookouts.", src: "Xanterra" },
+    { id: "ys_washburn", cat: "outdoor", day: 22, name: "Mount Washburn hike, Yellowstone", lat: 44.798, lng: -110.434, detour: "Dunraven Pass, north of Canyon", note: "About 6 miles round trip to a fire lookout with views across the park; bighorn sheep are common near the top. The biggest hike in this list." },
+    { id: "ys_northrim", cat: "outdoor", day: 22, name: "North Rim Trail, Grand Canyon of the Yellowstone", lat: 44.7186, lng: -110.496, detour: "Canyon Village", note: "Links Inspiration Point, Grand View, and Lookout Point along the rim, with the steep Brink of Lower Falls spur. Uncle Tom’s Trail stairs have been closed; check status." },
+    { id: "bs_lonepeak", cat: "outdoor", day: 22, name: "Lone Peak Expedition, Big Sky", lat: 45.278, lng: -111.45, detour: "Big Sky Resort", note: "Chairlift, then a safari-style vehicle, then the tram to the 11,166-foot summit, with views of three states and two national parks. Book a time slot.", src: "Big Sky Resort" },
+    { id: "bs_basecamp", cat: "outdoor", day: 22, name: "Big Sky Basecamp: ziplines, ropes, climbing", lat: 45.285, lng: -111.4, detour: "Big Sky Resort Mountain Village", note: "Ziplines, a high ropes course, climbing wall, bungee trampoline, and giant swing; good for anyone not riding the bike park.", src: "Travel Channel" },
+    { id: "bs_levinski", cat: "outdoor", day: 22, name: "Lake Levinski paddleboards and kayaks", lat: 45.287, lng: -111.396, detour: "Big Sky Resort", note: "Paddleboards and kayaks on a small lake below Lone Peak; an easy cool-down after the bike park.", src: "Big Sky Resort" },
+    { id: "bs_gallatin", cat: "outdoor", day: 22, name: "Gallatin River whitewater (Mad Mile)", lat: 45.33, lng: -111.21, detour: "Gallatin Canyon, 15 minutes from Big Sky", note: "Half-day Class III–IV trips through rapids like the Mad Mile; minimum age is usually 6. The upper river is a mellower float.", src: "Outfitter guides" },
+    { id: "bs_flyfish", cat: "outdoor", day: 22, name: "Fly fishing the Gallatin River", lat: 45.265, lng: -111.25, detour: "Along US-191", note: "Guided half-day trips are a good intro; everyone 12 and older needs a Montana fishing license." },
+    { id: "bs_beehive", cat: "outdoor", day: 22, name: "Beehive Basin hike, Big Sky", lat: 45.324, lng: -111.399, detour: "10 minutes above Mountain Village", note: "About 6.5 miles round trip to an alpine basin and lake with Lone Peak views; one of the best hikes in the area." },
+    { id: "bs_lavalake", cat: "outdoor", day: 21, name: "Lava Lake hike, Gallatin Canyon", lat: 45.315, lng: -111.224, detour: "On US-191 near the 35 mph bridge", note: "About 6 miles round trip to a mountain lake; a good leg-stretch on the drive in from West Yellowstone." },
+    { id: "bs_music", cat: "odd", day: 22, name: "Music in the Mountains, Big Sky", lat: 45.2618, lng: -111.308, detour: "Big Sky Town Center", note: "Free outdoor concerts on Thursday nights in July and August. Our Big Sky nights are Saturday and Sunday, so this only works if the plan shifts.", src: "Outside Bozeman" },
+    { id: "bs_horse", cat: "outdoor", day: 22, name: "Horseback ride near Big Sky", lat: 45.125, lng: -111.21, detour: "Gallatin Canyon ranches", note: "Guest ranches along US-191 run one- and two-hour trail rides; book ahead." }
   ],
 
 
@@ -269,6 +302,88 @@ window.TRIP = {
   // Alternate routes the family can compare and vote on. "replaces" is the range of main-plan days (0 = July 3)
   // that the option swaps out. Miles and hours are estimates; the app recalculates user-built routes live.
   alternates: [
+    {
+      id: "alt_ys_fullday",
+      title: "Yellowstone: a full day (no other changes)",
+      summary: "Moves the Teton Pass ride to Friday so Saturday is all Yellowstone. Same overnights, nothing to rebook. Adds about 4 hours in the park.",
+      replaces: { from: 20, to: 21 },
+      days: [
+        { date: "2027-07-23", title: "Teton Pass morning, Tetons afternoon",
+          stay: { name: "Gros Ventre Campground", lat: 43.616, lng: -110.667 },
+          stops: [
+            { name: "Teton Pass trails", lat: 43.497, lng: -110.953, cat: "ride", note: "Ride in the morning, before the afternoon heat and thunderstorms." },
+            { name: "Jenny Lake boat to Hidden Falls", lat: 43.752, lng: -110.724, cat: "park", note: "Afternoon in the park." },
+            { name: "String Lake", lat: 43.788, lng: -110.729, cat: "swim", note: "Swim to cool off." }
+          ] },
+        { date: "2027-07-24", title: "All day in Yellowstone", drive: { from: "Jackson", to: "Big Sky", miles: 220, hours: "5" },
+          note: "Leave Jackson by 6:30 a.m. and plan to reach Big Sky around dinner.",
+          stay: { name: "Wes’s, Big Sky", lat: 45.2618, lng: -111.308 },
+          stops: [
+            { name: "Oxbow Bend", lat: 43.8653, lng: -110.548, cat: "view", note: "Quick stop on the way north, early light." },
+            { name: "West Thumb Geyser Basin", lat: 44.4167, lng: -110.5733, cat: "park", note: "Hot springs on the lake." },
+            { name: "Old Faithful and the Upper Geyser Basin", lat: 44.4605, lng: -110.8281, cat: "park", note: "Time an eruption, then walk to Morning Glory Pool." },
+            { name: "Lone Star Geyser bike trail", lat: 44.4466, lng: -110.805, cat: "ride", note: "4.8-mile round trip ride to a backcountry geyser." },
+            { name: "Grand Prismatic Overlook", lat: 44.5153, lng: -110.8325, cat: "park", note: "From the Fairy Falls lot." },
+            { name: "Firehole Canyon Drive", lat: 44.629, lng: -110.864, cat: "swim", note: "Swim area if it’s open." }
+          ] }
+      ]
+    },
+    {
+      id: "alt_ys_twodays",
+      title: "Yellowstone: two days, using the Big Sky day",
+      summary: "The full Yellowstone day above, plus a second day from Big Sky to Norris, the Grand Canyon of the Yellowstone, and Hayden Valley. Same overnights, nothing to rebook, but no Big Sky Bike Park day.",
+      replaces: { from: 20, to: 22 },
+      days: [
+        { date: "2027-07-23", title: "Teton Pass morning, Tetons afternoon",
+          stay: { name: "Gros Ventre Campground", lat: 43.616, lng: -110.667 },
+          stops: [
+            { name: "Teton Pass trails", lat: 43.497, lng: -110.953, cat: "ride", note: "Morning ride." },
+            { name: "Jenny Lake boat to Hidden Falls", lat: 43.752, lng: -110.724, cat: "park", note: "Afternoon in the park." }
+          ] },
+        { date: "2027-07-24", title: "Yellowstone, south and west", drive: { from: "Jackson", to: "Big Sky", miles: 220, hours: "5" },
+          note: "Leave Jackson by 6:30 a.m.",
+          stay: { name: "Wes’s, Big Sky", lat: 45.2618, lng: -111.308 },
+          stops: [
+            { name: "West Thumb Geyser Basin", lat: 44.4167, lng: -110.5733, cat: "park", note: "Hot springs on the lake." },
+            { name: "Old Faithful and the Upper Geyser Basin", lat: 44.4605, lng: -110.8281, cat: "park", note: "Time an eruption." },
+            { name: "Lone Star Geyser bike trail", lat: 44.4466, lng: -110.805, cat: "ride", note: "Ride to a backcountry geyser." },
+            { name: "Grand Prismatic Overlook", lat: 44.5153, lng: -110.8325, cat: "park", note: "From the Fairy Falls lot." }
+          ] },
+        { date: "2027-07-25", title: "Yellowstone, Norris to Canyon", drive: { from: "Big Sky", to: "Big Sky (loop through Canyon)", miles: 200, hours: "5" },
+          note: "A loop from Big Sky through the West Entrance. Leave early; Hayden Valley wildlife is best in the morning and evening.",
+          stay: { name: "Wes’s, Big Sky", lat: 45.2618, lng: -111.308 },
+          stops: [
+            { name: "Gibbon Falls", lat: 44.6532, lng: -110.7712, cat: "view", note: "Roadside waterfall between Madison and Norris." },
+            { name: "Norris Geyser Basin", lat: 44.7268, lng: -110.7037, cat: "park", note: "The hottest geyser basin, home of Steamboat, the world’s tallest active geyser." },
+            { name: "Grand Canyon of the Yellowstone: Artist Point and Brink of Lower Falls", lat: 44.7202, lng: -110.4789, cat: "park", note: "Yellow canyon walls and the 308-foot Lower Falls. The Brink of Lower Falls trail is steep but short." },
+            { name: "Hayden Valley", lat: 44.6461, lng: -110.4614, cat: "park", note: "Bison herds and sometimes bears or wolves. Use pullouts and stay in the car if animals are close." }
+          ] }
+      ]
+    },
+    {
+      id: "alt_ys_night",
+      title: "Yellowstone: a night inside the park",
+      summary: "Trades one night at Wes’s for a night at Canyon or Old Faithful, so you get evening and early-morning Yellowstone, then a half day at the Big Sky Bike Park. Needs an in-park booking, which is open now for July 2027.",
+      replaces: { from: 21, to: 22 },
+      days: [
+        { date: "2027-07-24", title: "Into Yellowstone, night at Canyon", drive: { from: "Jackson", to: "Canyon Village, Yellowstone", miles: 140, hours: "4" },
+          note: "Ride Teton Pass on Friday instead. In-park rooms for July 2027 are already bookable on Yellowstone National Park Lodges.",
+          stay: { name: "Canyon Lodge (or Old Faithful Inn)", lat: 44.7348, lng: -110.488 },
+          stops: [
+            { name: "West Thumb Geyser Basin", lat: 44.4167, lng: -110.5733, cat: "park", note: "First stop from the South Entrance." },
+            { name: "Old Faithful and the Upper Geyser Basin", lat: 44.4605, lng: -110.8281, cat: "park", note: "Time an eruption." },
+            { name: "Grand Prismatic Overlook", lat: 44.5153, lng: -110.8325, cat: "park", note: "From the Fairy Falls lot." },
+            { name: "Hayden Valley at dusk", lat: 44.6461, lng: -110.4614, cat: "park", note: "15 minutes from Canyon; the best wildlife time." }
+          ] },
+        { date: "2027-07-25", title: "Canyon morning, Big Sky afternoon", drive: { from: "Canyon Village", to: "Big Sky", miles: 90, hours: "2.5" },
+          stay: { name: "Wes’s, Big Sky", lat: 45.2618, lng: -111.308 },
+          stops: [
+            { name: "Grand Canyon of the Yellowstone: Artist Point and Brink of Lower Falls", lat: 44.7202, lng: -110.4789, cat: "park", note: "Go at opening, before the crowds." },
+            { name: "Norris Geyser Basin", lat: 44.7268, lng: -110.7037, cat: "park", note: "On the way out." },
+            { name: "Big Sky Bike Park", lat: 45.2858, lng: -111.4012, cat: "ride", note: "Afternoon laps; check closing time." }
+          ] }
+      ]
+    },
     {
       id: "alt_greatlakes_aug1",
       title: "Great Lakes finish: Chicago, Detroit, Niagara (home Aug 1)",
