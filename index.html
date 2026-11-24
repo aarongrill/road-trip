@@ -131,6 +131,21 @@
   .stops li.done .n { text-decoration: line-through; }
   .section-title { font-size: 1.15rem; margin: 14px 0 4px; color: var(--forest); }
 
+  .stagehead { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; margin-bottom: 6px; }
+  .stagehead h2 { font-size: 1.35rem; line-height: 1.1; }
+  .stagehead p { margin: 2px 0 0; color: var(--muted); font-size: 0.86rem; }
+  .stagehead .btn { padding: 8px 12px; font-size: 1rem; }
+  .stagenum { font-size: 0.78rem; color: var(--road); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+  .dayhead { width: 100%; text-align: left; border: 0; border-radius: 10px; background: var(--bg); color: var(--ink); cursor: pointer;
+    display: flex; justify-content: space-between; gap: 8px; align-items: baseline; padding: 8px 10px; margin: 12px 0 2px; font-weight: 700; }
+  .dayhead small { color: var(--muted); font-weight: 400; }
+  .dayhead.focus { background: var(--road); color: #fff; }
+  .dayhead.focus small { color: #e5ecf7; }
+  .stagelist { list-style: none; padding: 0; margin: 6px 0 14px; }
+  .stagelist button { width: 100%; text-align: left; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 9px 12px; margin-bottom: 6px; cursor: pointer; display: grid; grid-template-columns: 30px 1fr; gap: 8px; }
+  .stagelist b { color: var(--road); }
+  .stagelist small { color: var(--muted); display: block; }
+  .backrow { margin-bottom: 8px; }
   .detail h2 { font-size: 1.6rem; margin-bottom: 2px; }
   .detail .kind { color: var(--muted); margin: 0 0 8px; }
   .detail .note { margin: 0 0 12px; }
@@ -165,7 +180,7 @@
   .modes button[aria-pressed="true"] { background: #fff; color: var(--forest); }
   
   #listView { position: fixed; inset: 0; z-index: 450; overflow-y: auto; background: var(--bg);
-    padding: calc(var(--bar-h, 110px) + 12px) 0 calc(28px + env(safe-area-inset-bottom, 0px)); -webkit-overflow-scrolling: touch; }
+    padding: 0 0 calc(28px + env(safe-area-inset-bottom, 0px)); -webkit-overflow-scrolling: touch; }
   body.mode-list #map, body.mode-list .fab, body.mode-list .locate, body.mode-list .sheet, body.mode-list .crosshair, body.mode-list .placebar,
   body.mode-ideas #map, body.mode-ideas .fab, body.mode-ideas .locate, body.mode-ideas .sheet, body.mode-ideas .crosshair, body.mode-ideas .placebar { display: none !important; }
   body.mode-map #listView, body.mode-map #ideasView, body.mode-list #ideasView, body.mode-ideas #listView { display: none; }
@@ -190,7 +205,29 @@
   .listtools { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
   .listtools .btn.add { background: var(--mine); color: #fff; border-color: var(--mine); }
   .legtitle { font-size: 1.35rem; color: var(--forest); margin: 20px 0 8px; }
-  details.dayc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 8px; scroll-margin-top: calc(var(--bar-h, 110px) + 10px); }
+  :root { --pmap-h: 34vh; }
+  .lsplit { max-width: 1200px; margin: 0 auto; padding-top: var(--bar-h, 150px); }
+  .lpane { position: sticky; top: var(--bar-h, 150px); z-index: 20; background: var(--bg); padding: 0 14px 10px; }
+  #pmap { height: var(--pmap-h); min-height: 190px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); }
+  .pcap { display: flex; align-items: center; gap: 6px; padding: 8px 0 6px; flex-wrap: wrap; }
+  .pcap .ptitle { flex: 1; min-width: 150px; font-weight: 700; line-height: 1.2; }
+  .pcap .ptitle small { display: block; font-weight: 400; color: var(--muted); font-size: 0.82rem; }
+  .pcap .btn { padding: 5px 10px; font-size: 0.85rem; }
+  .plegend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+  .plegend i { display: inline-block; width: 18px; height: 0; border-top: 4px solid; vertical-align: middle; margin-right: 4px; border-radius: 2px; }
+  .legtabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 8px; }
+  .legtabs button[aria-pressed="true"] { background: var(--road); color: #fff; border-color: var(--road); }
+  details.dayc.active { border-color: var(--road); box-shadow: 0 0 0 2px var(--road); }
+  @media (min-width: 900px) {
+    details.dayc { scroll-margin-top: calc(var(--bar-h, 110px) + 10px); }
+    .lsplit { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 18px; align-items: start; }
+    .lpane { order: 2; padding: 0 14px 0 0; }
+    #listMain { padding-top: 10px; }
+    #pmap { height: calc(100vh - var(--bar-h, 150px) - 90px); }
+    #listMain .listwrap { max-width: none; }
+    :root { --pmap-h: 0px; }
+  }
+  details.dayc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 8px; scroll-margin-top: calc(var(--bar-h, 110px) + var(--pmap-h) + 115px); }
   details.dayc.today { border-color: var(--blaze); box-shadow: inset 4px 0 0 var(--blaze); }
   details.dayc > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; }
   details.dayc > summary::-webkit-details-marker { display: none; }
@@ -216,7 +253,15 @@
 </head>
 <body>
 <div id="map" aria-label="Trip map"></div>
-<div id="listView" aria-label="Trip list"></div>
+<div id="listView" aria-label="Trip list">
+  <div class="lsplit">
+    <aside class="lpane" aria-label="Map preview">
+      <div class="pcap" id="pcap"></div>
+      <div id="pmap"></div>
+    </aside>
+    <div id="listMain"></div>
+  </div>
+</div>
 <div id="ideasView" aria-label="Ideas and votes"></div>
 
 <header class="bar">
@@ -243,9 +288,9 @@
   <div class="sheet-body" id="sheetBody"></div>
 </section>
 
-<script src="config.js?v=8"></script>
-<script src="data.js?v=8"></script>
-<script src="route-geometry.js?v=8" onerror="window.ROUTE_GEOMETRY = null"></script>
+<script src="config.js?v=10"></script>
+<script src="data.js?v=10"></script>
+<script src="route-geometry.js?v=10" onerror="window.ROUTE_GEOMETRY = null"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function () {
@@ -331,7 +376,7 @@
   // 3) Otherwise ask the free OSRM routing service once, then save the result.
   async function loadRoadRoute() {
     const KEY = "roadgeom:" + T.route.length + ":" + T.route[1].join(",");
-    const apply = pts => { if (pts && pts.length > 10) { routeLine.setLatLngs(pts); routeLine.setStyle({ dashArray: null, opacity: 0.75 }); } };
+    const apply = pts => { if (pts && pts.length > 10) { routeLine.setLatLngs(pts); routeLine.setStyle({ dashArray: null, opacity: 0.75 }); if (typeof refreshPreview === "function" && mode === "list") refreshPreview(); if (typeof drawStageRoute === "function") drawStageRoute(); } };
     if (Array.isArray(window.ROUTE_GEOMETRY) && window.ROUTE_GEOMETRY.length) { apply(window.ROUTE_GEOMETRY); return; }
     const cached = store.get(KEY, null);
     if (cached) { apply(cached); return; }
@@ -413,7 +458,8 @@
   const catMatch = id => navCat === "all" || catsOf(id).has(navCat);
   const matches = id => (IDEA[id] && !showIdeas) ? false : catMatch(id);
   function applyFilters() {
-    Object.entries(markers).forEach(([id, m]) => matches(id) ? m.addTo(map) : map.removeLayer(m));
+    const inStage = activeStage === null ? null : stageIds(activeStage);
+    Object.entries(markers).forEach(([id, m]) => (matches(id) && (!inStage || inStage.has(id))) ? m.addTo(map) : map.removeLayer(m));
     highlightDay();
   }
   function renderNav() {
@@ -424,7 +470,8 @@
     if (cat !== undefined) { navCat = cat; store.set("navcat", navCat); }
     if (ideas !== undefined) { showIdeas = ideas; store.set("showIdeas", showIdeas); }
     renderNav(); applyFilters();
-    if (mode === "list") renderList(undefined, true);
+    if (mode === "list") { renderList(undefined, true); refreshPreview(); }
+    if (mode === "map" && activeStage !== null && !document.querySelector("#sheetBody .detail, #sheetBody form")) renderStageSheet();
     if (mode === "ideas") renderIdeas();
   }
 
@@ -463,13 +510,95 @@
 
   function selectDay(i, fly = true) {
     selectedDay = i;
-    renderDays(); highlightDay(); showDay();
+    renderDays();
+    showStage(i === null ? null : stageOf(i), false);
+    highlightDay();
     if (!fly) return;
     if (i === null) { map.fitBounds(routeLine.getBounds(), fitPad()); return; }
     const pts = [...dayPlaces[i].map(id => [P[id].lat, P[id].lng]), ...mine.filter(s => s.day === i).map(s => [s.lat, s.lng])];
     const prev = i > 0 && T.days[i - 1].stay ? P[T.days[i - 1].stay] : null;
     if (prev && T.days[i].drive) pts.push([prev.lat, prev.lng]);
     if (pts.length) map.fitBounds(L.latLngBounds(pts), Object.assign(fitPad(), { maxZoom: 12 }));
+  }
+
+  // ---------- stages (smaller legs on the Map view) ----------
+  const STAGES = T.stages || [];
+  let activeStage = null;
+  const stageLayer = L.layerGroup().addTo(map);
+  const stageOf = i => Math.max(0, STAGES.findIndex(s => i >= s.from && i <= s.to));
+  function stageIds(n) {
+    const st = STAGES[n], ids = new Set();
+    for (let i = st.from; i <= st.to; i++) {
+      const d = T.days[i];
+      [...dayPlaces[i], ...mine.filter(s => s.day === i).map(s => s.id), ...IDEAS.filter(x => x.day === i).map(x => x.id)].forEach(id => ids.add(id));
+    }
+    if (st.from > 0 && T.days[st.from - 1].stay) ids.add(T.days[st.from - 1].stay); // where the stage starts
+    return ids;
+  }
+  function stageMiles(n) { const st = STAGES[n]; let m = 0; for (let i = st.from; i <= st.to; i++) m += (T.days[i].drive || {}).miles || 0; return m; }
+  const shortDate = s => { const d = parse(s); return `${MONTHS[d.getMonth()]} ${d.getDate()}`; };
+  function stageDates(n) { const st = STAGES[n]; return st.from === st.to ? longDate(T.days[st.from].date) : `${shortDate(T.days[st.from].date)}–${parse(T.days[st.to].date).getDate()}`; }
+
+  function drawStageRoute() {
+    stageLayer.clearLayers();
+    if (activeStage === null) { routeLine.setStyle({ color: "#1D4E89", weight: 4, opacity: 0.75 }); return; }
+    routeLine.setStyle({ color: "#8A9A8E", weight: 3, opacity: 0.55 });
+    const cuts = routeCuts(), st = STAGES[activeStage];
+    for (let i = st.from; i <= st.to; i++) {
+      const seg = segment(cuts, i); if (!seg.length) continue;
+      const focus = i === selectedDay;
+      L.polyline(seg, { color: focus ? "#0B3A73" : "#1D4E89", weight: focus ? 7 : 5, opacity: 0.9, interactive: false }).addTo(stageLayer);
+    }
+  }
+  function stageBounds(n, day) {
+    const cuts = routeCuts(), st = STAGES[n], pts = [];
+    const from = day === undefined || day === null ? st.from : day, to = day === undefined || day === null ? st.to : day;
+    for (let i = from; i <= to; i++) {
+      segment(cuts, i).forEach(p => pts.push(p));
+      dayItems(T.days[i], i).forEach(id => { const ll = itemLatLng(id); if (ll) pts.push(ll); });
+      if (T.days[i].stay && P[T.days[i].stay]) pts.push([P[T.days[i].stay].lat, P[T.days[i].stay].lng]);
+    }
+    return pts.length ? L.latLngBounds(pts) : null;
+  }
+  function showStage(n, fly = true, day) {
+    activeStage = n;
+    if (day !== undefined) { selectedDay = day; renderDays(); }
+    drawStageRoute(); applyFilters(); highlightDay();
+    renderSheet();
+    if (!fly) return;
+    if (n === null) { map.fitBounds(routeLine.getBounds(), fitPad()); return; }
+    const b = stageBounds(n, day); if (b) map.fitBounds(b, Object.assign(fitPad(), { maxZoom: 12 }));
+  }
+  function renderSheet() { if (activeStage === null) showDay(); else renderStageSheet(); }
+
+  function renderStageSheet() {
+    const n = activeStage, st = STAGES[n];
+    const filt = navCat === "all" ? "" : (NAV.find(([k]) => k === navCat) || [, ""])[1];
+    let html = `<div class="stagehead">
+        <button class="btn" data-stage="${n === 0 ? "all" : n - 1}" aria-label="Previous leg">◀</button>
+        <div><span class="stagenum">Leg ${n + 1} of ${STAGES.length}</span><h2>${esc(st.title)}</h2>
+          <p>${stageDates(n)} · ${stageMiles(n) ? `${stageMiles(n).toLocaleString()} mi of driving` : "No long drives"}${filt ? ` · Showing ${filt}` : ""}</p></div>
+        <button class="btn" data-stage="${n === STAGES.length - 1 ? "all" : n + 1}" aria-label="Next leg">▶</button>
+      </div>`;
+    for (let i = st.from; i <= st.to; i++) {
+      const d = T.days[i], dt = parse(d.date);
+      const items = dayItems(d, i);
+      const label = id => {
+        if (IDEA[id] && !P[id]) return `Idea · ${ICAT[IDEA[id].cat].label}`;
+        if (!P[id]) return "My spot";
+        if (id === d.stay) return "Tonight";
+        const t = P[id].type;
+        return t === "ride" ? "Ride" : t === "meal" ? "Meal stop" : t === "fun" ? "Fun stop" : (KIND[t] || {}).label || "";
+      };
+      html += `<button class="dayhead ${i === selectedDay ? "focus" : ""}" data-focusday="${i}">
+          <span>Day ${i + 1} · ${WD[dt.getDay()]} ${MONTHS[dt.getMonth()]} ${dt.getDate()} · ${esc(d.title)}</span>
+          <small>${d.drive ? `🚗 ${d.drive.miles} mi` : d.ride ? "🚵" : ""}</small></button>`;
+      if (navCat === "all" && d.drive) html += `<p class="fineprint" style="margin:4px 2px 0">${esc(d.drive.from)} to ${esc(d.drive.to)}, about ${d.drive.hours} hours</p>`;
+      if (navCat === "all" && d.note) html += `<p class="fineprint" style="margin:4px 2px 0">⚠️ ${esc(d.note)}</p>`;
+      html += items.length ? `<ul class="stops">${items.map(id => stopItem(id, label(id))).join("")}</ul>`
+        : `<p class="fineprint" style="margin:6px 2px">Nothing in this category on this day.</p>`;
+    }
+    $("sheetBody").innerHTML = html;
   }
 
   // ---------- sheet ----------
@@ -486,9 +615,10 @@
   const dirUrl = p => `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
 
   function stopItem(id, kindLabel) {
-    const p = P[id] || mine.find(s => s.id === id); if (!p) return "";
-    const isMine = !P[id];
-    const icon = isMine ? (MY_CATS[p.cat] || MY_CATS.note).icon : (p.emoji || (KIND[p.type] || {}).icon || "📍");
+    const isIdea = !P[id] && !!IDEA[id];
+    const p = P[id] || mine.find(s => s.id === id) || IDEA[id]; if (!p) return "";
+    const isMine = !P[id] && !isIdea;
+    const icon = isIdea ? ICAT[p.cat].icon : isMine ? (MY_CATS[p.cat] || MY_CATS.note).icon : (p.emoji || (KIND[p.type] || {}).icon || "📍");
     return `<li class="${done[id] ? "done" : ""}"><button data-stop="${id}"><span class="ic" aria-hidden="true">${icon}</span>
       <span><span class="k">${esc(kindLabel)}</span><span class="n">${esc(p.name)}</span></span></button></li>`;
   }
@@ -500,7 +630,9 @@
       const when = td < 0 ? `Starts in ${-td} days` : td >= T.days.length ? "Trip complete" : `Today is day ${td + 1}`;
       body.innerHTML = `
         <div class="head">${shield(T.days.length)}<div><h2>The whole trip</h2><p>${T.days.length} days, July 3 to 31 · ${when}</p></div></div>
-        <p class="summary">Pick a day at the top, tap any pin, or add your own spot with the pink button.</p>
+        <p class="summary">Step through the trip one leg at a time, or pick a day at the top. Tap any stop to see it on the map.</p>
+        <div class="stagehead" style="grid-template-columns:1fr auto"><b>${STAGES.length} legs</b><button class="btn primary" data-stage="0">Start with leg 1 ▶</button></div>
+        <ul class="stagelist">${STAGES.map((st, k) => `<li><button data-stage="${k}"><b>${k + 1}</b><span>${esc(st.title)}<small>${stageDates(k)} · ${stageMiles(k) ? stageMiles(k).toLocaleString() + " mi" : "no long drives"}</small></span></button></li>`).join("")}</ul>
         <p class="fineprint">Use the buttons at the top to show only food, attractions, biking, swimming, views, or places to sleep. “Ideas on” adds the stops you can vote on.</p>
         <h3 class="section-title">My spots (${mine.length})</h3>
         ${mine.length ? `<ul class="stops">${mine.map(s => stopItem(s.id, s.day === null || s.day === undefined ? (MY_CATS[s.cat] || MY_CATS.note).label : `Day ${s.day + 1} · ${(MY_CATS[s.cat] || MY_CATS.note).label}`)).join("")}</ul>`
@@ -540,7 +672,7 @@
     const p = P[id]; const k = KIND[p.type] || {};
     const di = dayOf[id];
     const canVisit = p.type === "fun" || p.type === "meal";
-    $("sheetBody").innerHTML = `<div class="detail">
+    $("sheetBody").innerHTML = `<div class="detail"><div class="backrow"><button class="btn" data-backsheet="1">◀ Back to ${activeStage === null ? "the trip" : "leg " + (activeStage + 1)}</button></div>
       <h2>${p.emoji ? p.emoji + " " : ""}${esc(p.name)}</h2>
       <p class="kind">${esc(k.label || "")}${di !== undefined ? ` · Day ${di + 1}, ${longDate(T.days[di].date)}` : ""}</p>
       ${p.note ? `<p class="note">${esc(p.note)}</p>` : ""}
@@ -557,7 +689,7 @@
   function showMine(id) {
     const s = mine.find(x => x.id === id); if (!s) return;
     const c = MY_CATS[s.cat] || MY_CATS.note;
-    $("sheetBody").innerHTML = `<div class="detail">
+    $("sheetBody").innerHTML = `<div class="detail"><div class="backrow"><button class="btn" data-backsheet="1">◀ Back to ${activeStage === null ? "the trip" : "leg " + (activeStage + 1)}</button></div>
       <h2>${c.icon} ${esc(s.name)}</h2>
       <p class="kind">My spot · ${esc(c.label)}${s.day !== null && s.day !== undefined ? ` · Day ${s.day + 1}` : ""}</p>
       ${s.note ? `<p class="note">${esc(s.note)}</p>` : ""}
@@ -624,7 +756,7 @@
       cat = b.dataset.cat;
       $("fCats").querySelectorAll("[data-cat]").forEach(x => x.setAttribute("aria-pressed", x === b));
     };
-    $("fCancel").onclick = () => isEdit ? showMine(s.id) : showDay();
+    $("fCancel").onclick = () => isEdit ? showMine(s.id) : renderSheet();
     $("addForm").onsubmit = e => {
       e.preventDefault();
       const name = $("fName").value.trim();
@@ -662,7 +794,7 @@
           mine.push(rec); syncSpot(rec);
           added++;
         });
-        saveMine(); showDay();
+        saveMine(); renderSheet();
         alert(added ? `Imported ${added} spot${added === 1 ? "" : "s"}.` : "No new spots in that file.");
       } catch (e) { alert("That file isn’t a spots export from this app."); }
     };
@@ -728,7 +860,7 @@
 
   function showIdea(id) {
     const x = IDEA[id]; const c = ICAT[x.cat];
-    $("sheetBody").innerHTML = `<div class="detail">
+    $("sheetBody").innerHTML = `<div class="detail"><div class="backrow"><button class="btn" data-backsheet="1">◀ Back to ${activeStage === null ? "the trip" : "leg " + (activeStage + 1)}</button></div>
       <h2>${c.icon} ${esc(x.name)}</h2>
       <p class="kind">Idea · ${c.label} · Day ${x.day + 1}, ${longDate(T.days[x.day].date)}</p>
       <p class="note">${esc(x.note)}</p>
@@ -787,6 +919,7 @@
 
   function refreshAll() {
     drawMine(); applyFilters(); highlightDay();
+    if (mode === "map" && activeStage !== null && !document.querySelector("#sheetBody .detail, #sheetBody form")) renderStageSheet();
     if (mode === "list") renderList();
     if (mode === "ideas") renderIdeas();
   }
@@ -869,7 +1002,9 @@
     let html = `<div class="listwrap"><div class="listtools">
       <button class="btn" data-expand="all">Expand all</button>
       <button class="btn" data-expand="none">Collapse all</button>
-      <button class="btn add" data-addspot="1">+ Add a spot</button></div>`;
+      <button class="btn add" data-addspot="1">+ Add a spot</button></div>
+      <div class="legtabs" role="group" aria-label="Show a leg on the map">${[1, 2, 3].map(n =>
+        `<button class="btn" data-leg="${n}" aria-pressed="${activeLeg === n}" aria-label="Show ${LEGS[n].label} on the map">🗺️ Leg ${n}</button>`).join("")}</div>`;
     let lastLeg = "";
     let shown = 0;
     T.days.forEach((d, i) => {
@@ -891,7 +1026,9 @@
     html += loose.length ? `<div class="dayc" style="padding:4px 14px">${loose.map(s => prow(s.id)).join("")}</div>`
       : `<p class="fineprint">Spots you add without picking a day show up here.</p>`;
     html += `</div>`;
-    $("listView").innerHTML = html;
+    suppressToggle = true; setTimeout(() => { suppressToggle = false; }, 400);
+    $("listMain").innerHTML = html;
+    document.querySelectorAll("details.dayc").forEach(el => el.classList.toggle("active", Number(el.dataset.i) === activeDay));
   }
 
   function setBarHeight() { document.documentElement.style.setProperty("--bar-h", document.querySelector(".bar").offsetHeight + "px"); }
@@ -902,14 +1039,114 @@
     document.body.classList.toggle("mode-map", m === "map");
     document.body.classList.toggle("mode-ideas", m === "ideas");
     document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === m));
-    if (m === "list") renderList();
+    if (m === "list") {
+      renderList(); initPreview();
+      setTimeout(() => { if (activeDay === null && !activeLeg) { const td = todayDiff(); previewDay(td >= 0 && td < T.days.length ? td : (Number((document.querySelector("details.dayc[open]") || {}).dataset?.i) || 0)); } else refreshPreview(); }, 60);
+    }
     else if (m === "ideas") renderIdeas();
     else { setTimeout(() => { map.invalidateSize(); highlightDay(); }, 0); }
   }
 
+  // ---------- list map preview ----------
+  const LEGS = { 1: { label: "Leg 1: Home to Dillon", from: 0, to: 7 }, 2: { label: "Leg 2: Dillon to Big Sky", from: 8, to: 22 }, 3: { label: "Leg 3: Big Sky to home", from: 23, to: 28 } };
+  let pmap = null, pLayer = null, activeDay = null, activeLeg = null, suppressToggle = false;
+
+  function initPreview() {
+    if (pmap) { setTimeout(() => pmap.invalidateSize(), 0); return; }
+    pmap = L.map("pmap", { zoomControl: true, scrollWheelZoom: false });
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(pmap);
+    pLayer = L.layerGroup().addTo(pmap);
+    pmap.fitBounds(routeLine.getBounds(), { padding: [10, 10] });
+  }
+
+  // Where each night's stop falls along the route line, so each day's drive can be cut out of it
+  function routeCuts() {
+    const pts = routeLine.getLatLngs();
+    const idx = []; let last = 0;
+    T.days.forEach(d => {
+      const p = P[d.stay];
+      if (p) {
+        let best = last, bd = Infinity;
+        for (let k = last; k < pts.length; k++) {
+          const dd = (pts[k].lat - p.lat) ** 2 + (pts[k].lng - p.lng) ** 2;
+          if (dd < bd - 1e-9) { bd = dd; best = k; }
+        }
+        last = best;
+      }
+      idx.push(last);
+    });
+    return { pts, idx };
+  }
+  function segment(cuts, i) {
+    if (i < 0 || i >= T.days.length) return [];
+    const a = i === 0 ? 0 : cuts.idx[i - 1], b = cuts.idx[i];
+    return b > a ? cuts.pts.slice(a, b + 1) : [];
+  }
+  function itemLatLng(id) { const p = P[id] || IDEA[id] || mine.find(s => s.id === id); return p ? [p.lat, p.lng] : null; }
+  function itemIcon(id) {
+    if (IDEA[id] && !P[id]) return `<div class="pin idea">${ICAT[IDEA[id].cat].icon}</div>`;
+    const sp = !P[id] && mine.find(s => s.id === id);
+    if (sp) return `<div class="pin mine"><span>${(MY_CATS[sp.cat] || MY_CATS.note).icon}</span></div>`;
+    const p = P[id]; return `<div class="pin">${p.emoji || (KIND[p.type] || {}).icon || "📍"}</div>`;
+  }
+  function addPins(ids) {
+    ids.forEach(id => {
+      const ll = itemLatLng(id); if (!ll) return;
+      const name = (P[id] || IDEA[id] || mine.find(s => s.id === id)).name;
+      L.marker(ll, { icon: L.divIcon({ className: "", html: itemIcon(id), iconSize: [26, 26], iconAnchor: [13, 13] }), title: name })
+        .bindTooltip(esc(name), { direction: "top", offset: [0, -10] }).addTo(pLayer);
+    });
+  }
+  const legend = `<div class="plegend"><span><i style="border-color:#8A9A8E;border-top-style:dashed"></i>Day before</span><span><i style="border-color:#1D4E89"></i>This day</span><span><i style="border-color:#D9621A;border-top-style:dashed"></i>Day after</span></div>`;
+
+  function previewDay(i) {
+    if (!pmap || i === null || i === undefined) return;
+    activeDay = i; activeLeg = null;
+    document.querySelectorAll("details.dayc").forEach(el => el.classList.toggle("active", Number(el.dataset.i) === i));
+    document.querySelectorAll("[data-leg]").forEach(b => b.setAttribute("aria-pressed", "false"));
+    const cuts = routeCuts(), d = T.days[i];
+    pLayer.clearLayers();
+    const prev = segment(cuts, i - 1), cur = segment(cuts, i), next = segment(cuts, i + 1);
+    if (prev.length) L.polyline(prev, { color: "#8A9A8E", weight: 4, dashArray: "6 7", opacity: 0.9 }).addTo(pLayer);
+    if (next.length) L.polyline(next, { color: "#D9621A", weight: 4, dashArray: "6 7", opacity: 0.85 }).addTo(pLayer);
+    if (cur.length) L.polyline(cur, { color: "#1D4E89", weight: 6, opacity: 0.9 }).addTo(pLayer);
+    const ids = dayItems(d, i);
+    addPins(ids);
+    const pts = [...cur, ...ids.map(itemLatLng).filter(Boolean)];
+    if (!pts.length && P[d.stay]) pts.push([P[d.stay].lat, P[d.stay].lng]);
+    if (pts.length > 1) pmap.fitBounds(L.latLngBounds(pts), { padding: [24, 24], maxZoom: 12 });
+    else if (pts.length) pmap.setView(pts[0], 11);
+    const drive = d.drive ? `${esc(d.drive.from)} to ${esc(d.drive.to)}, ${d.drive.miles} mi` : "No long drive";
+    $("pcap").innerHTML = `
+      <button class="btn" data-pday="${i - 1}" ${i === 0 ? "disabled" : ""} aria-label="Previous day">◀ Day ${i}</button>
+      <span class="ptitle">Day ${i + 1}: ${esc(d.title)}<small>${longDate(d.date)} · ${drive}</small></span>
+      <button class="btn" data-pday="${i + 1}" ${i === T.days.length - 1 ? "disabled" : ""} aria-label="Next day">Day ${i + 2} ▶</button>` + legend;
+  }
+
+  function previewLeg(n) {
+    if (!pmap) return;
+    const L3 = LEGS[n]; activeLeg = n; activeDay = null;
+    document.querySelectorAll("details.dayc").forEach(el => el.classList.remove("active"));
+    document.querySelectorAll("[data-leg]").forEach(b => b.setAttribute("aria-pressed", String(Number(b.dataset.leg) === n)));
+    const cuts = routeCuts();
+    pLayer.clearLayers();
+    L.polyline(cuts.pts, { color: "#8A9A8E", weight: 3, opacity: 0.5 }).addTo(pLayer);
+    let legPts = [];
+    for (let i = L3.from; i <= L3.to; i++) { const seg = segment(cuts, i); if (seg.length) { L.polyline(seg, { color: "#1D4E89", weight: 5, opacity: 0.9 }).addTo(pLayer); legPts = legPts.concat(seg); } }
+    const ids = [];
+    for (let i = L3.from; i <= L3.to; i++) dayItems(T.days[i], i).forEach(id => { if (!ids.includes(id)) ids.push(id); });
+    addPins(ids);
+    const all = [...legPts, ...ids.map(itemLatLng).filter(Boolean)];
+    if (all.length) pmap.fitBounds(L.latLngBounds(all), { padding: [20, 20] });
+    $("pcap").innerHTML = `<span class="ptitle">${L3.label}<small>Days ${L3.from + 1}–${L3.to + 1} · ${longDate(T.days[L3.from].date)} to ${longDate(T.days[L3.to].date)}</small></span>
+      <button class="btn" data-pday="${L3.from}">Start of leg ▶</button>`;
+  }
+  function refreshPreview() { if (activeLeg) previewLeg(activeLeg); else if (activeDay !== null) previewDay(activeDay); }
+
   function scrollToDay(i) {
     renderList(i);
     const el = $("day-" + i); if (el) { el.open = true; el.scrollIntoView({ block: "start" }); }
+    previewDay(i);
   }
 
   // ---------- events ----------
@@ -923,6 +1160,15 @@
   document.addEventListener("click", e => {
     const t = e.target;
     const mb = t.closest("[data-mode]"); if (mb) { setMode(mb.dataset.mode); return; }
+    const sg = t.closest("[data-stage]");
+    if (sg) { const v = sg.dataset.stage; selectedDay = null; renderDays(); showStage(v === "all" ? null : Number(v)); if (v !== "all") setOpen(true); return; }
+    const fd = t.closest("[data-focusday]");
+    if (fd) { const i = Number(fd.dataset.focusday); selectedDay = selectedDay === i ? null : i; renderDays(); drawStageRoute(); highlightDay(); renderStageSheet();
+      const b = stageBounds(activeStage, selectedDay === null ? undefined : i); if (b) map.fitBounds(b, Object.assign(fitPad(), { maxZoom: 12 })); return; }
+    if (t.closest("[data-backsheet]")) { renderSheet(); return; }
+    const pd = t.closest("[data-pday]"); if (pd) { scrollToDay(Number(pd.dataset.pday)); return; }
+    const lg = t.closest("[data-leg]");
+    if (lg) { const n = Number(lg.dataset.leg); previewLeg(n); const el = $("day-" + LEGS[n].from); if (el) el.scrollIntoView({ block: "start" }); return; }
     const vb = t.closest("[data-vote]"); if (vb) { toggleVote(vb.dataset.vote); if (!$("ideasView").offsetParent && document.body.classList.contains("sheet-open")) { const id = vb.dataset.vote; IDEA[id] ? showIdea(id) : showMine(id); } return; }
     const ai = t.closest("[data-addidea]"); if (ai) { addIdeaToPlan(ai.dataset.addidea); if (mode === "map") showIdea(ai.dataset.addidea); return; }
     const si = t.closest("[data-showidea]");
@@ -944,7 +1190,7 @@
     }
     if (t.closest("[data-addspot]")) { setMode("map"); setTimeout(() => startPlacing(), 30); return; }
     const stop = t.closest("[data-stop]");
-    if (stop) { const id = stop.dataset.stop; P[id] ? showPlace(id) : showMine(id); return; }
+    if (stop) { const id = stop.dataset.stop; P[id] ? showPlace(id) : IDEA[id] ? showIdea(id) : showMine(id); return; }
     const nav = t.closest("[data-nav]"); if (nav) { selectDay(Number(nav.dataset.nav)); return; }
     const gd = t.closest("[data-goday]"); if (gd) { selectDay(Number(gd.dataset.goday)); return; }
     const v = t.closest("[data-visit]");
@@ -956,12 +1202,19 @@
     const del = t.closest("[data-delete]");
     if (del) {
       const s = mine.find(x => x.id === del.dataset.delete);
-      if (s && confirm(`Delete “${s.name}”?`)) { mine = mine.filter(x => x.id !== s.id); delete markers[s.id]; saveMine(); syncRemove(s.id); showDay(); setOpen(false); }
+      if (s && confirm(`Delete “${s.name}”?`)) { mine = mine.filter(x => x.id !== s.id); delete markers[s.id]; saveMine(); syncRemove(s.id); renderSheet(); setOpen(false); }
       return;
     }
 
     if (t.id === "exportBtn") { exportMine(); return; }
   });
+  $("listView").addEventListener("toggle", e => {
+    const el = e.target;
+    if (suppressToggle || !el.matches || !el.matches("details.dayc") || !el.open) return;
+    previewDay(Number(el.dataset.i));
+  }, true);
+  window.addEventListener("resize", () => { if (pmap && mode === "list") pmap.invalidateSize(); });
+
   document.addEventListener("change", e => {
     if (e.target.id === "importFile" && e.target.files[0]) importMine(e.target.files[0]);
     if (e.target.id === "ideaSort") { ideaSort = e.target.value; store.set("ideaSort", ideaSort); renderIdeas(); }
@@ -1007,6 +1260,6 @@
   if (mode === "list" && startDay !== null) scrollToDay(startDay);
 })();
 </script>
-<script type="module" src="sync.js?v=8"></script>
+<script type="module" src="sync.js?v=10"></script>
 </body>
 </html>

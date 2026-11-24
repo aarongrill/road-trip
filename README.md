@@ -9,15 +9,21 @@ The row of buttons under Map, List, and Ideas narrows every view at once: 🍴 F
 ## The three views
 
 **Map**
-- A full-screen map you can scroll and zoom. Tap a day at the top to zoom to its stops, or "All" for the whole route.
-- Tap any pin for details. Teal circle pins are ideas you can vote on.
+- The trip is split into 12 smaller legs (for example "Memphis to Bentonville" or "Jackson and the Tetons"). The bottom panel shows one leg at a time; use ◀ and ▶ to move between legs, or pick one from the list on the whole-trip screen.
+- The map zooms to the leg, highlights its drives in blue (the rest of the route turns gray), and shows only that leg's stops.
+- The panel lists every stop for each day of the leg. Tap a day's heading to zoom to that day, and tap a stop to see its details on the map. "◀ Back" returns to the list.
+- The filters at the top narrow both the pins and the list.
+- Tap a day at the top to jump to its leg. Tap "All" for the whole trip.
 - **+ Add a spot**: move the map until the pin is on the spot, tap "Put the pin here," then name it, pick a type, and attach it to a day.
 - The ◎ button shows where you are.
+- To change how the legs are split, edit `stages` in `data.js`.
 
 **List**
 - Every day of the trip, grouped by leg. Tap a day to expand it and see the drive, rides, meal stop, fun stops, stops the family added, and where we're sleeping.
 - Each stop has Directions, Show on map, and Trail info buttons, plus "Mark visited."
 - During the trip, today is highlighted and opens automatically.
+- A map preview shows the day you open: that day's drive in solid blue, the day before as a gray dashed line, and the day after as an orange dashed line, with the day's stops as pins. Use ◀ and ▶ to step through days. The 🗺️ Leg 1, Leg 2, and Leg 3 buttons show a whole leg.
+- On a phone, the preview stays pinned at the top while the list scrolls under it. On a wider screen, it sits to the right of the list.
 
 **Ideas**
 - Researched options along the route: fun places to eat, odd roadside stops, views and rest stops, and swim stops (water parks, pools, swimming holes, lakes, and hot springs), each with the day it fits, the detour, and details.

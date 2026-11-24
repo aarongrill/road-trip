@@ -223,6 +223,23 @@ window.TRIP = {
     { id: "hersheyboard", cat: "swim", day: 28, name: "The Boardwalk at Hersheypark", lat: 40.288, lng: -76.655, detour: "In Hershey, near Chocolate World", note: "Hersheypark’s water park area, if there’s time for one last splash before home. Needs a park ticket." }
   ],
 
+
+  // Smaller legs for the Map view. from/to are day numbers (0 = July 3).
+  stages: [
+    { title: "NJ to Tennessee and Windrock", from: 0, to: 1 },
+    { title: "Nashville", from: 2, to: 3 },
+    { title: "Memphis to Bentonville", from: 4, to: 5 },
+    { title: "Kansas City and the drive to Dillon", from: 6, to: 7 },
+    { title: "Dillon week with the cousins", from: 8, to: 13 },
+    { title: "Crested Butte to Fruita", from: 14, to: 16 },
+    { title: "Park City and Deer Valley", from: 17, to: 18 },
+    { title: "Jackson and the Tetons", from: 19, to: 20 },
+    { title: "Yellowstone to Big Sky", from: 21, to: 22 },
+    { title: "Black Hills and Badlands", from: 23, to: 24 },
+    { title: "Wisconsin Dells to Starved Rock", from: 25, to: 26 },
+    { title: "Raystown Lake and home", from: 27, to: 28 }
+  ],
+
   checklist: [
     "Book Sylvan Lake in Custer State Park (reservations open a year ahead)",
     "Confirm dates with Rebekah, Aaron’s parents, Bryant, and Wes",
