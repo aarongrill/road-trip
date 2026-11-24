@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#2F5D3A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Road Trip 2027</title>
-<!-- App version 18 -->
+<!-- App version 19 -->
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,6 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css">
 <style>
   :root {
     --bg: #EEF2EA; --surface: #F9FBF6; --ink: #17251C; --muted: #56655A; --line: #D3DCCF;
@@ -364,6 +365,30 @@
   .xrow .btnrow { margin-top: 5px; }
   .xpin { width: 14px; height: 14px; border-radius: 50%; background: #E0A800; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.5); }
 
+  /* Map markers: color = category, solid ring = in the plan, dashed = idea, rounded square = where we sleep */
+  .mk { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #fff; border: 3px solid var(--c);
+    box-shadow: 0 1px 4px rgba(0,0,0,.4); font-size: 16px; line-height: 1; box-sizing: border-box; padding: 0; margin: 0; }
+  .mk.stay { border-radius: 9px; width: 32px; height: 32px; background: var(--c); border-color: #fff; font-size: 17px; }
+  .mk.idea { width: 25px; height: 25px; border-width: 2px; border-style: dashed; font-size: 13px; }
+  .mk.mine { border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--mine); border-color: #fff; }
+  .mk.mine span { transform: rotate(45deg); }
+  .mcl { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--forest); color: #fff;
+    font-weight: 700; font-size: 0.95rem; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.4); }
+  .keybtn { position: fixed; z-index: 550; left: 10px; bottom: calc(var(--sheet-peek) + var(--tab-h) + 16px); border: 0; border-radius: 999px;
+    background: var(--surface); color: var(--ink); padding: 8px 12px; font-weight: 700; box-shadow: 0 3px 10px rgba(0,0,0,.3); cursor: pointer; }
+  .keycard { position: fixed; z-index: 560; left: 10px; bottom: calc(var(--sheet-peek) + var(--tab-h) + 64px); background: var(--surface); color: var(--ink);
+    border-radius: 12px; padding: 12px 14px; box-shadow: 0 4px 16px rgba(0,0,0,.3); font-size: 0.88rem; max-width: 270px; }
+  .keycard .row2 { display: flex; align-items: center; gap: 8px; margin: 5px 0; }
+  .keycard .sw { width: 14px; height: 14px; border-radius: 50%; border: 3px solid var(--c); background: #fff; flex: none; }
+  .keycard .mk { width: 24px; height: 24px; font-size: 12px; flex: none; }
+  .keycard .mk.stay { width: 24px; height: 24px; }
+  body.sheet-open .keybtn, body.sheet-open .keycard, body:not(.mode-map) .keybtn, body:not(.mode-map) .keycard, body.adding .keybtn { display: none; }
+  @media (min-width: 900px), (orientation: landscape) and (min-width: 640px) {
+    .keybtn, body.sheet-open .keybtn { display: block; bottom: calc(var(--tab-h) + 16px); }
+    .keycard, body.sheet-open .keycard { bottom: calc(var(--tab-h) + 64px); }
+    body:not(.mode-map) .keybtn, body:not(.mode-map) .keycard { display: none; }
+  }
+
   /* Today view */
   #todayView { display: none; position: fixed; inset: 0; z-index: 450; overflow-y: auto; background: var(--bg);
     padding: calc(var(--bar-h, 70px) + 12px) 0 calc(var(--tab-h) + 24px); -webkit-overflow-scrolling: touch; }
@@ -424,6 +449,8 @@
 <div id="todayView" aria-label="Today"></div>
 
 <button class="locate" id="locateBtn" aria-label="Show where I am">◎</button>
+<button class="keybtn" id="keyBtn" aria-expanded="false" aria-controls="keyCard">🔑 Map key</button>
+<div class="keycard" id="keyCard" hidden></div>
 <button class="fab" id="addBtn">+ Add a spot</button>
 
 <div class="crosshair" id="crosshair" hidden aria-hidden="true">📍</div>
@@ -440,10 +467,11 @@
   <div class="sheet-body" id="sheetBody"></div>
 </section>
 
-<script src="config.js?v=18"></script>
-<script src="data.js?v=18"></script>
-<script src="route-geometry.js?v=18" onerror="window.ROUTE_GEOMETRY = null"></script>
+<script src="config.js?v=19"></script>
+<script src="data.js?v=19"></script>
+<script src="route-geometry.js?v=19" onerror="window.ROUTE_GEOMETRY = null"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
 <script>
 (function () {
   const T = window.TRIP, P = T.places;
@@ -554,6 +582,50 @@
 
   const markers = {}; // id -> marker
 
+  const CAT_COLOR = { eat: "#B07D0B", see: "#7A4FA3", ride: "#D9621A", swim: "#1E88C7", view: "#2E8B57", park: "#2F5D3A", outdoor: "#8B5A2B", sleep: "#1D4E89", mine: "#C2185B" };
+  const CAT_NAME = { eat: "Food", see: "Attractions", ride: "Biking", swim: "Swimming", view: "Views and rest stops", park: "National parks", outdoor: "Outdoor activities", sleep: "Where we sleep" };
+  // The one category that sets a marker's color
+  function pinCat(id) {
+    if (P[id]) {
+      const p = P[id], c = catsOf(id);
+      if (["camp", "hotel", "host", "home", "airport"].includes(p.type)) return "sleep";
+      if (p.type === "ride") return "ride";
+      if (p.type === "meal") return "eat";
+      return c.has("swim") ? "swim" : c.has("park") ? "park" : "see";
+    }
+    if (IDEA[id]) { const k = IDEA[id].cat; return k === "odd" ? "see" : k; }
+    return "mine";
+  }
+  function pinEmoji(id) {
+    if (P[id]) { const p = P[id]; return p.emoji || (KIND[p.type] || {}).icon || "📍"; }
+    if (IDEA[id]) return ICAT[IDEA[id].cat].icon;
+    const sp = mine.find(s => s.id === id); return sp ? (MY_CATS[sp.cat] || MY_CATS.note).icon : "📍";
+  }
+  function pinHTML(id) {
+    const cat = pinCat(id), color = CAT_COLOR[cat] || "#56655A";
+    const kind = !P[id] && !IDEA[id] ? "mine" : cat === "sleep" && P[id] ? "stay" : IDEA[id] && !P[id] ? "idea" : "plan";
+    return `<div class="mk ${kind}" style="--c:${color}"><span aria-hidden="true">${pinEmoji(id)}</span></div>`;
+  }
+  function pinIcon(id) {
+    const kind = !P[id] && !IDEA[id] ? "mine" : IDEA[id] && !P[id] ? "idea" : pinCat(id) === "sleep" ? "stay" : "plan";
+    const size = kind === "idea" ? 25 : kind === "stay" ? 32 : 30;
+    const anchor = kind === "mine" ? [size / 2, size] : [size / 2, size / 2];
+    return L.divIcon({ className: "", html: pinHTML(id), iconSize: [size, size], iconAnchor: anchor });
+  }
+  function renderKey() {
+    $("keyCard").innerHTML = `<b>Map key</b>
+      ${Object.entries(CAT_NAME).map(([k, n]) => `<div class="row2"><span class="sw" style="--c:${CAT_COLOR[k]}"></span>${n}</div>`).join("")}
+      <div class="row2" style="margin-top:8px"><span class="mk plan" style="--c:#56655A"><span>🎡</span></span>Solid ring: in the plan</div>
+      <div class="row2"><span class="mk idea" style="--c:#56655A"><span>💡</span></span>Dashed ring: an idea to vote on</div>
+      <div class="row2"><span class="mk stay" style="--c:#1D4E89"><span>⛺</span></span>Square: where we sleep</div>
+      <div class="row2"><span class="mcl" style="width:24px;height:24px;font-size:.75rem;border-width:2px">5</span>Number: several stops close together; zoom in</div>`;
+  }
+  // Nearby markers group into a numbered bubble when zoomed out (falls back to plain markers if the library is unavailable)
+  const markerLayer = L.markerClusterGroup ? L.markerClusterGroup({
+    maxClusterRadius: 32, disableClusteringAtZoom: 10, showCoverageOnHover: false, spiderfyOnMaxZoom: true,
+    iconCreateFunction: c => L.divIcon({ className: "", html: `<div class="mcl">${c.getChildCount()}</div>`, iconSize: [38, 38], iconAnchor: [19, 19] })
+  }).addTo(map) : L.layerGroup().addTo(map);
+
   function iconFor(p, isMine) {
     if (isMine) {
       const c = MY_CATS[p.cat] || MY_CATS.note;
@@ -566,23 +638,22 @@
   function drawBuiltIns() {
     Object.entries(P).forEach(([id, p]) => {
       const k = KIND[p.type]; if (!k) return;
-      const m = L.marker([p.lat, p.lng], { icon: iconFor(p), keyboard: true, title: p.name });
+      const m = L.marker([p.lat, p.lng], { icon: pinIcon(id), keyboard: true, title: p.name });
       m.on("click", () => showPlace(id));
       markers[id] = m;
     });
   }
   function drawMine() {
-    Object.keys(markers).forEach(id => { if (!P[id] && !IDEA[id]) { map.removeLayer(markers[id]); delete markers[id]; } });
+    Object.keys(markers).forEach(id => { if (!P[id] && !IDEA[id]) { markerLayer.removeLayer(markers[id]); delete markers[id]; } });
     mine.forEach(s => {
-      const m = L.marker([s.lat, s.lng], { icon: iconFor(s, true), title: s.name, keyboard: true });
+      const m = L.marker([s.lat, s.lng], { icon: pinIcon(s.id), title: s.name, keyboard: true });
       m.on("click", () => showMine(s.id));
       markers[s.id] = m;
     });
   }
   function drawIdeas() {
     IDEAS.forEach(x => {
-      const icon = L.divIcon({ className: "", html: `<div class="pin idea">${ICAT[x.cat].icon}</div>`, iconSize: [26, 26], iconAnchor: [13, 13] });
-      const m = L.marker([x.lat, x.lng], { icon, title: x.name, keyboard: true });
+      const m = L.marker([x.lat, x.lng], { icon: pinIcon(x.id), title: x.name, keyboard: true });
       m.on("click", () => showIdea(x.id));
       markers[x.id] = m;
     });
@@ -614,9 +685,11 @@
   const catMatch = id => navCat === "all" || catsOf(id).has(navCat);
   const matches = id => (IDEA[id] && !showIdeas) ? false : catMatch(id);
   function applyFilters() {
-    if (typeof shownAlt !== "undefined" && shownAlt) { Object.values(markers).forEach(m => map.removeLayer(m)); return; }
+    markerLayer.clearLayers();
+    if (typeof shownAlt !== "undefined" && shownAlt) return;
     const inStage = activeStage === null ? null : stageIds(activeStage);
-    Object.entries(markers).forEach(([id, m]) => (matches(id) && (!inStage || inStage.has(id))) ? m.addTo(map) : map.removeLayer(m));
+    const show = Object.entries(markers).filter(([id]) => matches(id) && (!inStage || inStage.has(id))).map(([, m]) => m);
+    if (markerLayer.addLayers) markerLayer.addLayers(show); else show.forEach(m => markerLayer.addLayer(m));
     highlightDay();
   }
   function renderFilterBtn() {
@@ -857,7 +930,7 @@
         <h3 class="section-title">My spots (${mine.length})</h3>
         ${mine.length ? `<ul class="stops">${mine.map(s => stopItem(s.id, s.day === null || s.day === undefined ? (MY_CATS[s.cat] || MY_CATS.note).label : `Day ${s.day + 1} · ${(MY_CATS[s.cat] || MY_CATS.note).label}`)).join("")}</ul>`
           : `<p class="fineprint">Nothing added yet. Tap “+ Add a spot” to drop a pin anywhere on the map.</p>`}
-        <p class="fineprint">App version 18 (outdoor activities)</p>
+        <p class="fineprint">App version 19 (clearer map markers)</p>
         <h3 class="section-title">Share my spots</h3>
         <p class="fineprint">Spots are saved on this phone. To share them, export a file and import it on another phone.</p>
         <div class="btnrow">
@@ -1319,17 +1392,12 @@
     return b > a ? cuts.pts.slice(a, b + 1) : [];
   }
   function itemLatLng(id) { const p = P[id] || IDEA[id] || mine.find(s => s.id === id); return p ? [p.lat, p.lng] : null; }
-  function itemIcon(id) {
-    if (IDEA[id] && !P[id]) return `<div class="pin idea">${ICAT[IDEA[id].cat].icon}</div>`;
-    const sp = !P[id] && mine.find(s => s.id === id);
-    if (sp) return `<div class="pin mine"><span>${(MY_CATS[sp.cat] || MY_CATS.note).icon}</span></div>`;
-    const p = P[id]; return `<div class="pin">${p.emoji || (KIND[p.type] || {}).icon || "📍"}</div>`;
-  }
+  function itemIcon(id) { return pinHTML(id); }
   function addPins(ids) {
     ids.forEach(id => {
       const ll = itemLatLng(id); if (!ll) return;
       const name = (P[id] || IDEA[id] || mine.find(s => s.id === id)).name;
-      L.marker(ll, { icon: L.divIcon({ className: "", html: itemIcon(id), iconSize: [26, 26], iconAnchor: [13, 13] }), title: name })
+      L.marker(ll, { icon: pinIcon(id), title: name })
         .bindTooltip(esc(name), { direction: "top", offset: [0, -10] }).addTo(pLayer);
     });
   }
@@ -1916,6 +1984,7 @@
       xv.textContent = "Saved ✓"; xv.disabled = true;
       return;
     }
+    if (t.closest("#keyBtn")) { const c = $("keyCard"); c.hidden = !c.hidden; $("keyBtn").setAttribute("aria-expanded", String(!c.hidden)); if (!c.hidden) renderKey(); return; }
     const nb = t.closest("[data-near]"); if (nb) { pickNear(nb.dataset.near); return; }
     const tp = t.closest("[data-todaypick]"); if (tp) { todayPick = Number(tp.dataset.todaypick); selectedDay = todayPick; renderDays(); renderToday(); $("todayView").scrollTo({ top: 0 }); return; }
     const sg = t.closest("[data-stage]");
@@ -2043,6 +2112,6 @@
   if (mode === "list" && startDay !== null) scrollToDay(startDay);
 })();
 </script>
-<script type="module" src="sync.js?v=18"></script>
+<script type="module" src="sync.js?v=19"></script>
 </body>
 </html>

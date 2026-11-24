@@ -2,7 +2,7 @@
 // - App files: network first (so updates show up right away), saved copy when offline.
 // - Leaflet and fonts: saved copy first.
 // - Map tiles: saved as you view them (never bulk-downloaded, per OpenStreetMap's tile policy).
-const VERSION = "rt27-v18";
+const VERSION = "rt27-v19";
 const APP = VERSION + "-app";
 const TILES = "rt27-tiles";
 const MAX_TILES = 3000;
@@ -10,7 +10,9 @@ const CORE = ["./", "./index.html", "./data.js", "./config.js", "./sync.js", "./
 const OPTIONAL = ["./route-geometry.js"];
 const LIBS = [
   "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css",
-  "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
+  "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js",
+  "https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css",
+  "https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"
 ];
 
 self.addEventListener("install", event => {
