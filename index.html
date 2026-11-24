@@ -98,7 +98,29 @@
     display: flex; flex-direction: column;
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  body.sheet-open .sheet { height: 68vh; }
+  body.sheet-open .sheet { height: 50vh; }
+  body.sheet-open.sheet-full .sheet { height: 88vh; }
+  .sheet.dragging { transition: none; }
+  /* Small screens: drop the title row so the map gets more room */
+  @media (max-width: 639px), (max-height: 500px) { .bar .row { display: none; } .bar .modes { margin-top: 8px; } }
+  .handle { touch-action: none; }
+
+  /* Side-by-side: map on the left, details on the right (laptops, tablets, phones turned sideways) */
+  @media (min-width: 900px), (orientation: landscape) and (min-width: 640px) {
+    :root { --panel-w: min(460px, 42vw); }
+    .sheet, body.sheet-open .sheet, body.sheet-open.sheet-full .sheet {
+      left: auto; right: 0; top: var(--bar-h, 150px); bottom: 0; height: auto; width: var(--panel-w); max-width: none; margin: 0;
+      border-radius: 0; box-shadow: -2px 0 12px rgba(0,0,0,.15); padding-bottom: env(safe-area-inset-bottom, 0px); }
+    body.adding .sheet { display: flex; }
+    .handle { display: none; }
+    #map { right: var(--panel-w); }
+    .fab, body.sheet-open .fab { display: block; right: calc(var(--panel-w) + 14px); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+    .locate, body.sheet-open .locate { display: block; right: calc(var(--panel-w) + 14px); bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+    body.adding .fab, body.adding .locate { display: none; }
+    .crosshair { left: calc((100vw - var(--panel-w)) / 2); }
+    .placebar { right: calc(var(--panel-w) + 12px); }
+    .sheet-body { padding-top: 14px; }
+  }
   body.adding .sheet { display: none; }
   .handle { border: 0; background: transparent; padding: 8px 0 4px; cursor: pointer; width: 100%; flex: none; }
   .handle span { display: block; width: 44px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto; }
@@ -121,6 +143,9 @@
 
   .stops { list-style: none; margin: 0 0 14px; padding: 0; }
   .stops li + li { border-top: 1px solid var(--line); }
+  .stops li { display: flex; align-items: center; gap: 6px; }
+  .stops li > button { flex: 1; }
+  .infolink { flex: none; text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; font-size: 1rem; color: var(--ink); background: var(--surface); }
   .stops button {
     width: 100%; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer;
     display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 9px 2px; align-items: start;
@@ -288,9 +313,9 @@
   <div class="sheet-body" id="sheetBody"></div>
 </section>
 
-<script src="config.js?v=10"></script>
-<script src="data.js?v=10"></script>
-<script src="route-geometry.js?v=10" onerror="window.ROUTE_GEOMETRY = null"></script>
+<script src="config.js?v=12"></script>
+<script src="data.js?v=12"></script>
+<script src="route-geometry.js?v=12" onerror="window.ROUTE_GEOMETRY = null"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function () {
@@ -476,14 +501,22 @@
   }
 
   // Keep a point visible above the bottom sheet and below the top bar
+  const splitMQ = window.matchMedia("(min-width: 900px), (orientation: landscape) and (min-width: 640px)");
+  const isSplit = () => splitMQ.matches;
+  function sheetHeight() {
+    if (isSplit()) return 0;
+    const b = document.body.classList;
+    return b.contains("sheet-open") ? window.innerHeight * (b.contains("sheet-full") ? 0.88 : 0.5) : 150;
+  }
   function focusOn(lat, lng) {
-    const sheetH = document.body.classList.contains("sheet-open") ? window.innerHeight * 0.68 : 150;
+    if (isSplit()) { map.panTo([lat, lng]); return; }
+    const sheetH = sheetHeight();
     const topH = document.querySelector(".bar").offsetHeight;
     const targetY = (topH + (window.innerHeight - sheetH)) / 2;
     map.panTo([lat, lng], { animate: false });
     map.panBy([0, window.innerHeight / 2 - targetY], { animate: true });
   }
-  const fitPad = () => ({ paddingTopLeft: [30, document.querySelector(".bar").offsetHeight + 30], paddingBottomRight: [30, 180] });
+  const fitPad = () => ({ paddingTopLeft: [30, document.querySelector(".bar").offsetHeight + 30], paddingBottomRight: [30, isSplit() ? 30 : sheetHeight() + 20] });
 
   // ---------- day strip ----------
   let selectedDay = null; // null = whole trip
@@ -602,8 +635,42 @@
   }
 
   // ---------- sheet ----------
-  const setOpen = open => document.body.classList.toggle("sheet-open", open);
-  $("handle").onclick = () => setOpen(!document.body.classList.contains("sheet-open"));
+  // Phone sheet has three heights: peek (map mostly visible), half (map and details split), full (details)
+  function setSheet(state) {
+    document.body.classList.toggle("sheet-open", state !== "peek");
+    document.body.classList.toggle("sheet-full", state === "full");
+  }
+  const sheetState = () => !document.body.classList.contains("sheet-open") ? "peek" : document.body.classList.contains("sheet-full") ? "full" : "half";
+  const setOpen = open => { if (open) { if (sheetState() === "peek") setSheet("half"); } else setSheet("peek"); };
+  $("handle").onclick = () => { if (dragMoved) return; setSheet({ peek: "half", half: "full", full: "peek" }[sheetState()]); };
+  let dragStart = null, dragMoved = false;
+  $("handle").addEventListener("pointerdown", e => {
+    if (isSplit()) return;
+    dragStart = { y: e.clientY, h: $("sheet").offsetHeight }; dragMoved = false;
+    $("handle").setPointerCapture(e.pointerId);
+  });
+  $("handle").addEventListener("pointermove", e => {
+    if (!dragStart) return;
+    const dy = dragStart.y - e.clientY;
+    if (Math.abs(dy) > 6) dragMoved = true;
+    if (!dragMoved) return;
+    const sh = $("sheet"); sh.classList.add("dragging");
+    sh.style.height = Math.min(window.innerHeight * 0.92, Math.max(120, dragStart.h + dy)) + "px";
+  });
+  $("handle").addEventListener("pointerup", () => {
+    if (!dragStart) return;
+    const sh = $("sheet"), h = sh.offsetHeight, H = window.innerHeight;
+    sh.classList.remove("dragging"); sh.style.height = "";
+    if (dragMoved) {
+      const opts = [["peek", 150], ["half", H * 0.5], ["full", H * 0.88]];
+      setSheet(opts.reduce((a, b) => Math.abs(b[1] - h) < Math.abs(a[1] - h) ? b : a)[0]);
+    }
+    dragStart = null; setTimeout(() => { dragMoved = false; }, 50);
+  });
+  // New panel content always starts at the top
+  new MutationObserver(() => { $("sheetBody").scrollTop = 0; }).observe($("sheetBody"), { childList: true });
+  splitMQ.addEventListener("change", () => setTimeout(() => map.invalidateSize(), 50));
+  window.addEventListener("resize", () => { if (mode === "map") map.invalidateSize(); });
 
   function shield(n) {
     return `<svg class="shield" viewBox="0 0 84 88" aria-hidden="true">
@@ -613,14 +680,23 @@
       <text x="42" y="${n > 9 ? 60 : 62}" text-anchor="middle" font-size="${n > 9 ? 36 : 42}" fill="#fff">${n}</text></svg>`;
   }
   const dirUrl = p => `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
+  // Link for any attraction: its own website when we have one, otherwise its Google Maps listing
+  // (which shows the website, hours, phone, and photos). Family homes get no link.
+  function infoLink(p, cls = "btn") {
+    if (!p || p.type === "host" || p.type === "home" || p.type === "airport") return "";
+    if (p.web) return `<a class="${cls}" href="${p.web}" target="_blank" rel="noopener">🔗 Website</a>`;
+    const q = encodeURIComponent(p.name);
+    return `<a class="${cls}" href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">🔗 Info and hours</a>`;
+  }
 
   function stopItem(id, kindLabel) {
     const isIdea = !P[id] && !!IDEA[id];
     const p = P[id] || mine.find(s => s.id === id) || IDEA[id]; if (!p) return "";
     const isMine = !P[id] && !isIdea;
     const icon = isIdea ? ICAT[p.cat].icon : isMine ? (MY_CATS[p.cat] || MY_CATS.note).icon : (p.emoji || (KIND[p.type] || {}).icon || "📍");
+    const link = infoLink(p, "infolink");
     return `<li class="${done[id] ? "done" : ""}"><button data-stop="${id}"><span class="ic" aria-hidden="true">${icon}</span>
-      <span><span class="k">${esc(kindLabel)}</span><span class="n">${esc(p.name)}</span></span></button></li>`;
+      <span><span class="k">${esc(kindLabel)}</span><span class="n">${esc(p.name)}</span></span></button>${link.replace(/>🔗[^<]*</, ' aria-label="Info and hours for ' + esc(p.name) + '">🔗<')}</li>`;
   }
 
   function showDay() {
@@ -679,6 +755,7 @@
       <div class="btnrow">
         <a class="btn primary" href="${dirUrl(p)}" target="_blank" rel="noopener">Directions</a>
         ${p.link ? `<a class="btn" href="${p.link}" target="_blank" rel="noopener">Trail info</a>` : ""}
+        ${infoLink(p)}
         ${canVisit ? `<button class="btn" data-visit="${id}">${done[id] ? "Visited ✓" : "Mark visited"}</button>` : ""}
         ${di !== undefined ? `<button class="btn" data-goday="${di}">See day ${di + 1}</button>` : ""}
       </div></div>`;
@@ -869,6 +946,7 @@
         ${voteBtn(id)}
         <button class="btn" data-addidea="${id}" ${inPlan(id) ? "disabled" : ""}>${inPlan(id) ? "In the plan ✓" : "Add to plan"}</button>
         <a class="btn primary" href="${dirUrl(x)}" target="_blank" rel="noopener">Directions</a>
+        ${infoLink(x)}
       </div>${votersLine(id)}</div>`;
     setOpen(true); focusOn(x.lat, x.lng);
   }
@@ -904,6 +982,7 @@
             <button class="btn" data-addidea="${x.id}" ${inPlan(x.id) ? "disabled" : ""}>${inPlan(x.id) ? "In the plan ✓" : "Add to plan"}</button>
             <button class="btn" data-showidea="${x.id}">Show on map</button>
             <a class="btn" href="${dirUrl(x)}" target="_blank" rel="noopener">Directions</a>
+            ${infoLink(x)}
           </div>
           ${votersLine(x.id)}
           ${x.src ? `<p class="src">Source: ${esc(x.src)}</p>` : ""}
@@ -942,6 +1021,7 @@
         <button class="btn" data-addidea="${id}" ${inPlan(id) ? "disabled" : ""}>${inPlan(id) ? "In the plan ✓" : "Add to plan"}</button>
         <button class="btn" data-showidea="${id}">Show on map</button>
         <a class="btn" href="${dirUrl(p)}" target="_blank" rel="noopener">Directions</a>
+        ${infoLink(p)}
       </div></div>`;
     return `<div class="prow ${done[id] ? "visited" : ""}">
       <div class="pn">${icon ? icon + " " : ""}${label ? esc(label) + ": " : ""}${esc(p.name)}</div>
@@ -950,6 +1030,7 @@
         <a class="btn" href="${dirUrl(p)}" target="_blank" rel="noopener">Directions</a>
         <button class="btn" data-showmap="${id}">Show on map</button>
         ${p.link ? `<a class="btn" href="${p.link}" target="_blank" rel="noopener">Trail info</a>` : ""}
+        ${infoLink(p)}
         ${canVisit ? `<button class="btn" data-visit="${id}">${done[id] ? "Visited ✓" : "Mark visited"}</button>` : ""}
         ${isMine ? voteBtn(id) + `<button class="btn" data-edit="${id}">Edit</button>` : ""}
       </div></div>`;
@@ -1161,7 +1242,7 @@
     const t = e.target;
     const mb = t.closest("[data-mode]"); if (mb) { setMode(mb.dataset.mode); return; }
     const sg = t.closest("[data-stage]");
-    if (sg) { const v = sg.dataset.stage; selectedDay = null; renderDays(); showStage(v === "all" ? null : Number(v)); if (v !== "all") setOpen(true); return; }
+    if (sg) { const v = sg.dataset.stage; selectedDay = null; renderDays(); if (v !== "all") setOpen(true); showStage(v === "all" ? null : Number(v)); return; }
     const fd = t.closest("[data-focusday]");
     if (fd) { const i = Number(fd.dataset.focusday); selectedDay = selectedDay === i ? null : i; renderDays(); drawStageRoute(); highlightDay(); renderStageSheet();
       const b = stageBounds(activeStage, selectedDay === null ? undefined : i); if (b) map.fitBounds(b, Object.assign(fitPad(), { maxZoom: 12 })); return; }
@@ -1245,7 +1326,7 @@
     });
     if (mode === "ideas") renderIdeas();
   });
-  map.on("click", () => { if (!document.body.classList.contains("adding")) setOpen(false); });
+  map.on("click", () => { if (!document.body.classList.contains("adding") && !isSplit()) setOpen(false); });
 
   // ---------- status + start ----------
   const td = todayDiff();
@@ -1260,6 +1341,6 @@
   if (mode === "list" && startDay !== null) scrollToDay(startDay);
 })();
 </script>
-<script type="module" src="sync.js?v=10"></script>
+<script type="module" src="sync.js?v=12"></script>
 </body>
 </html>

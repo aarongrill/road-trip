@@ -6,6 +6,10 @@ A phone-friendly companion app for our July 2027 mountain bike road trip. Switch
 
 The row of buttons under Map, List, and Ideas narrows every view at once: 🍴 Food, 🎡 Attractions, 🚵 Biking, 🏊 Swimming, 🏞️ Views & rest stops, and 🛏️ Sleep. Tap "All" to see everything. "💡 Ideas on/off" shows or hides the stops the family can vote on. In the List, days with nothing in the chosen category are hidden, and the rest open automatically.
 
+## Links
+
+Every attraction, restaurant, ride, swim stop, and place to stay has a 🔗 link in all three views. If a stop has a `web` address in `data.js`, the link opens that website. Otherwise it opens the stop's Google Maps listing, which shows the website, hours, phone number, and photos. Rides also keep their "Trail info" link. To add a website for any stop, add `web: "https://..."` to it in `data.js`.
+
 ## The three views
 
 **Map**
@@ -17,6 +21,8 @@ The row of buttons under Map, List, and Ideas narrows every view at once: 🍴 F
 - **+ Add a spot**: move the map until the pin is on the spot, tap "Put the pin here," then name it, pick a type, and attach it to a day.
 - The ◎ button shows where you are.
 - To change how the legs are split, edit `stages` in `data.js`.
+- On a laptop, tablet, or phone turned sideways, the map sits on the left and the leg details on the right, so you see both at once.
+- On a phone held upright, the details panel has three heights: peek (mostly map), half (map on top, details below; the default when you open a leg), and full (mostly details). Tap the handle to cycle through them or drag it. Tapping a stop moves it into the visible part of the map.
 
 **List**
 - Every day of the trip, grouped by leg. Tap a day to expand it and see the drive, rides, meal stop, fun stops, stops the family added, and where we're sleeping.
