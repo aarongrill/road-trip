@@ -159,8 +159,26 @@
   @media (max-width: 420px) { .bar .status { display: none; } }
   #listView { position: fixed; inset: 0; z-index: 450; overflow-y: auto; background: var(--bg);
     padding: calc(var(--bar-h, 110px) + 12px) 0 calc(28px + env(safe-area-inset-bottom, 0px)); -webkit-overflow-scrolling: touch; }
-  body.mode-list #map, body.mode-list .fab, body.mode-list .locate, body.mode-list .sheet, body.mode-list .crosshair, body.mode-list .placebar { display: none !important; }
-  body.mode-map #listView { display: none; }
+  body.mode-list #map, body.mode-list .fab, body.mode-list .locate, body.mode-list .sheet, body.mode-list .crosshair, body.mode-list .placebar,
+  body.mode-ideas #map, body.mode-ideas .fab, body.mode-ideas .locate, body.mode-ideas .sheet, body.mode-ideas .crosshair, body.mode-ideas .placebar { display: none !important; }
+  body.mode-map #listView, body.mode-map #ideasView, body.mode-list #ideasView, body.mode-ideas #listView { display: none; }
+  #ideasView { position: fixed; inset: 0; z-index: 450; overflow-y: auto; background: var(--bg);
+    padding: calc(var(--bar-h, 110px) + 12px) 0 calc(28px + env(safe-area-inset-bottom, 0px)); -webkit-overflow-scrolling: touch; }
+  .syncnote { border-radius: 10px; padding: 8px 12px; margin: 0 0 10px; font-size: 0.92rem; background: var(--surface); border: 1px solid var(--line); }
+  .syncnote.on { border-color: var(--forest); }
+  .whoami { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+  .whoami input { flex: 1; min-width: 140px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--surface); color: var(--ink); }
+  .ideasbar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+  .ideasbar button[aria-pressed="true"] { background: var(--forest); color: #fff; border-color: var(--forest); }
+  .ideasbar select { border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; background: var(--surface); color: var(--ink); }
+  .idea { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+  .idea h3 { font-family: "Atkinson Hyperlegible", system-ui, sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: 0; }
+  .idea .meta { color: var(--muted); font-size: 0.88rem; margin: 2px 0 6px; }
+  .idea p { margin: 0 0 8px; }
+  .idea .src { color: var(--muted); font-size: 0.82rem; }
+  .voters { color: var(--muted); font-size: 0.86rem; margin: 6px 0 0; }
+  .vote[aria-pressed="true"] { background: var(--road); color: #fff; border-color: var(--road); }
+  .pin.idea { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 2px solid #0F7C86; font-size: 14px; }
   .listwrap { max-width: 720px; margin: 0 auto; padding: 0 14px; }
   .listtools { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
   .listtools .btn.add { background: var(--mine); color: #fff; border-color: var(--mine); }
@@ -192,10 +210,11 @@
 <body>
 <div id="map" aria-label="Trip map"></div>
 <div id="listView" aria-label="Trip list"></div>
+<div id="ideasView" aria-label="Ideas and votes"></div>
 
 <header class="bar">
   <div class="row"><h1>Road Trip 2027</h1><span class="status" id="status"></span>
-    <div class="modes" role="group" aria-label="View"><button data-mode="list" aria-pressed="true">List</button><button data-mode="map" aria-pressed="false">Map</button></div></div>
+    <div class="modes" role="group" aria-label="View"><button data-mode="list" aria-pressed="true">List</button><button data-mode="map" aria-pressed="false">Map</button><button data-mode="ideas" aria-pressed="false">Ideas</button></div></div>
   <div class="days" id="days" aria-label="Choose a day"></div>
 </header>
 
@@ -216,6 +235,7 @@
   <div class="sheet-body" id="sheetBody"></div>
 </section>
 
+<script src="config.js"></script>
 <script src="data.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
@@ -233,8 +253,15 @@
     set(k, v) { try { localStorage.setItem("rt27:" + k, JSON.stringify(v)); } catch (e) {} }
   };
   let mine = store.get("mine", []);           // spots you add
+  let votes = store.get("votes", {});         // itemId -> { voterKey: name }
+  let voterName = store.get("voter", "");
+  let shared = false;                         // true when Firebase sync is on
+  const IDEAS = T.ideas || [];
+  const IDEA = Object.fromEntries(IDEAS.map(x => [x.id, x]));
+  const ICAT = { eat: { label: "Fun place to eat", icon: "🍴" }, odd: { label: "Odd stop", icon: "🤪" }, view: { label: "View or rest stop", icon: "🏞️" } };
   let done = store.get("done", {});           // visited marks
   let filters = store.get("filters2", { stay: true, ride: true, fun: true, meal: true, mine: true });
+  if (filters.ideas === undefined) filters.ideas = true;
 
   // ---------- dates ----------
   const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
@@ -259,6 +286,7 @@
     ride: { label: "Ride", icon: "🚵" },
     stay: { label: "Place to sleep", icon: "⛺" },
     gas: { label: "Gas or supplies", icon: "⛽" },
+    view: { label: "View or rest stop", icon: "🏞️" },
     note: { label: "Note", icon: "📝" }
   };
   const GROUPS = {
@@ -266,7 +294,8 @@
     ride: { label: "Ride", color: "#D9621A" },
     fun: { label: "Fun", color: "#7A4FA3" },
     meal: { label: "Meals", color: "#A07614" },
-    mine: { label: "My spots", color: "#C2185B" }
+    mine: { label: "My spots", color: "#C2185B" },
+    ideas: { label: "Ideas", color: "#0F7C86" }
   };
 
   // Which day each built-in place belongs to
@@ -310,6 +339,15 @@
       m.addTo(layers.mine); markers[s.id] = m;
     });
   }
+  function drawIdeas() {
+    layers.ideas.clearLayers();
+    IDEAS.forEach(x => {
+      const icon = L.divIcon({ className: "", html: `<div class="pin idea">${ICAT[x.cat].icon}</div>`, iconSize: [26, 26], iconAnchor: [13, 13] });
+      const m = L.marker([x.lat, x.lng], { icon, title: x.name, keyboard: true });
+      m.on("click", () => showIdea(x.id));
+      m.addTo(layers.ideas); markers[x.id] = m;
+    });
+  }
   function applyFilters() {
     Object.keys(GROUPS).forEach(g => filters[g] ? layers[g].addTo(map) : map.removeLayer(layers[g]));
   }
@@ -340,7 +378,7 @@
   }
 
   function highlightDay() {
-    const ids = selectedDay === null ? null : new Set([...dayPlaces[selectedDay], ...mine.filter(s => s.day === selectedDay).map(s => s.id)]);
+    const ids = selectedDay === null ? null : new Set([...dayPlaces[selectedDay], ...mine.filter(s => s.day === selectedDay).map(s => s.id), ...IDEAS.filter(x => x.day === selectedDay).map(x => x.id)]);
     Object.entries(markers).forEach(([id, m]) => {
       const el = m.getElement(); if (!el) return;
       el.classList.toggle("dim", !!ids && !ids.has(id));
@@ -451,6 +489,7 @@
       ${s.note ? `<p class="note">${esc(s.note)}</p>` : ""}
       <div class="btnrow">
         <a class="btn primary" href="${dirUrl(s)}" target="_blank" rel="noopener">Directions</a>
+        ${voteBtn(id)}
         <button class="btn" data-visit="${id}">${done[id] ? "Visited ✓" : "Mark visited"}</button>
         <button class="btn" data-edit="${id}">Edit</button>
         <button class="btn" data-move="${id}">Move pin</button>
@@ -479,7 +518,7 @@
     stopPlacing();
     if (pending && pending.moveId) {
       const s = mine.find(x => x.id === pending.moveId);
-      if (s) { s.lat = c.lat; s.lng = c.lng; saveMine(); showMine(s.id); }
+      if (s) { s.lat = c.lat; s.lng = c.lng; saveMine(); syncSpot(s); showMine(s.id); }
       pending = null; return;
     }
     showForm({ lat: c.lat, lng: c.lng, name: "", cat: "fun", day: selectedDay, note: "" });
@@ -519,7 +558,7 @@
       const dayVal = $("fDay").value;
       const rec = { id: s.id || "u" + Date.now(), name, cat, day: dayVal === "" ? null : Number(dayVal), note: $("fNote").value.trim(), lat: s.lat, lng: s.lng };
       if (isEdit) mine = mine.map(x => x.id === s.id ? rec : x); else mine.push(rec);
-      saveMine(); showMine(rec.id);
+      saveMine(); syncSpot(rec); showMine(rec.id);
     };
     if (!isEdit) setTimeout(() => $("fName").focus(), 250);
   }
@@ -544,8 +583,9 @@
         spots.forEach(s => {
           if (typeof s.lat !== "number" || typeof s.lng !== "number" || !s.name) return;
           if (mine.some(x => x.id === s.id)) return;
-          mine.push({ id: s.id || "u" + Date.now() + added, name: String(s.name).slice(0, 80), cat: MY_CATS[s.cat] ? s.cat : "note",
-            day: Number.isInteger(s.day) ? s.day : null, note: String(s.note || "").slice(0, 400), lat: s.lat, lng: s.lng });
+          const rec = { id: s.id || "u" + Date.now() + added, name: String(s.name).slice(0, 80), cat: MY_CATS[s.cat] ? s.cat : "note",
+            day: Number.isInteger(s.day) ? s.day : null, note: String(s.note || "").slice(0, 400), lat: s.lat, lng: s.lng };
+          mine.push(rec); syncSpot(rec);
           added++;
         });
         saveMine(); showDay();
@@ -568,6 +608,116 @@
   };
 
 
+  // ---------- votes ----------
+  const keyOf = n => (n || "").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 30) || "someone";
+  const vkey = id => (id && id.startsWith("i_") && IDEA[id.slice(2)]) ? id.slice(2) : id; // spots added from ideas share the idea's votes
+  const voteNames = id => Object.values(votes[vkey(id)] || {});
+  const iVoted = id => !!(votes[vkey(id)] || {})[keyOf(voterName)];
+  function voteBtn(id) {
+    const n = voteNames(id).length;
+    return `<button class="btn vote" data-vote="${id}" aria-pressed="${iVoted(id)}" aria-label="Vote for this stop, ${n} vote${n === 1 ? "" : "s"} so far">👍 ${n}</button>`;
+  }
+  function votersLine(id) { const v = voteNames(id); return v.length ? `<p class="voters">Votes: ${v.map(esc).join(", ")}</p>` : ""; }
+  function askName() {
+    const n = prompt("What’s your name? Your votes show up with it.", voterName || "");
+    if (n && n.trim()) { voterName = n.trim().slice(0, 30); store.set("voter", voterName); return true; }
+    return false;
+  }
+  function toggleVote(id) {
+    id = vkey(id);
+    if (!voterName && !askName()) return;
+    const k = keyOf(voterName);
+    votes[id] = Object.assign({}, votes[id]);
+    const on = !votes[id][k];
+    if (on) votes[id][k] = voterName; else delete votes[id][k];
+    store.set("votes", votes);
+    if (shared) window.TripSync.setVote(id, k, voterName, on);
+    refreshAll();
+  }
+  function toggleDone(id) {
+    done[id] = !done[id]; if (!done[id]) delete done[id];
+    store.set("done", done);
+    if (shared) window.TripSync.setDone(id, !!done[id]);
+  }
+  function syncSpot(rec) { if (shared) window.TripSync.setSpot(rec); }
+  function syncRemove(id) { if (shared) window.TripSync.removeSpot(id); }
+
+  // ---------- ideas ----------
+  function addIdeaToPlan(id) {
+    const x = IDEA[id]; const sid = "i_" + id;
+    if (mine.some(s => s.id === sid)) return;
+    const cat = x.cat === "eat" ? "meal" : x.cat === "view" ? "view" : "fun";
+    const rec = { id: sid, name: x.name, cat, day: x.day, note: `${x.note} (${x.detour})`, lat: x.lat, lng: x.lng };
+    mine.push(rec); saveMine(); syncSpot(rec); refreshAll();
+  }
+  const inPlan = id => mine.some(s => s.id === "i_" + id);
+
+  function showIdea(id) {
+    const x = IDEA[id]; const c = ICAT[x.cat];
+    $("sheetBody").innerHTML = `<div class="detail">
+      <h2>${c.icon} ${esc(x.name)}</h2>
+      <p class="kind">Idea · ${c.label} · Day ${x.day + 1}, ${longDate(T.days[x.day].date)}</p>
+      <p class="note">${esc(x.note)}</p>
+      <p class="kind">${esc(x.detour)}${x.src ? ` · Source: ${esc(x.src)}` : ""}</p>
+      <div class="btnrow">
+        ${voteBtn(id)}
+        <button class="btn" data-addidea="${id}" ${inPlan(id) ? "disabled" : ""}>${inPlan(id) ? "In the plan ✓" : "Add to plan"}</button>
+        <a class="btn primary" href="${dirUrl(x)}" target="_blank" rel="noopener">Directions</a>
+      </div>${votersLine(id)}</div>`;
+    setOpen(true); focusOn(x.lat, x.lng);
+  }
+
+  let ideaFilter = store.get("ideaFilter", "all"), ideaSort = store.get("ideaSort", "trip");
+  function renderIdeas() {
+    let list = IDEAS.filter(x => ideaFilter === "all" || x.cat === ideaFilter);
+    list = list.slice().sort((a, b) => ideaSort === "votes" ? (voteNames(b.id).length - voteNames(a.id).length) || (a.day - b.day) : a.day - b.day);
+    const cfg = window.SYNC_CONFIG || {};
+    const note = shared ? `<p class="syncnote on">Votes and added stops are shared with everyone on the trip.</p>`
+      : `<p class="syncnote">Votes are saved on this phone only.${cfg.firebase ? " Couldn’t connect to the shared list; check your connection." : " To share votes with the family, see the README."}</p>`;
+    const myIdeas = mine.filter(s => !s.id.startsWith("i_"));
+    $("ideasView").innerHTML = `<div class="listwrap">
+      ${note}
+      <div class="whoami"><label for="voterInput"><b>Voting as</b></label>
+        <input id="voterInput" maxlength="30" placeholder="Your name" value="${esc(voterName)}">
+        <button class="btn" id="saveVoter">Save name</button></div>
+      <div class="ideasbar" role="group" aria-label="Filter ideas">
+        ${[["all", "All"], ["eat", "🍴 Eats"], ["odd", "🤪 Odd stops"], ["view", "🏞️ Views and rest stops"]].map(([k, l]) =>
+          `<button class="btn" data-ifilter="${k}" aria-pressed="${ideaFilter === k}">${l}</button>`).join("")}
+        <select id="ideaSort" aria-label="Sort ideas">
+          <option value="trip" ${ideaSort === "trip" ? "selected" : ""}>Trip order</option>
+          <option value="votes" ${ideaSort === "votes" ? "selected" : ""}>Most votes</option>
+        </select>
+      </div>
+      ${list.map(x => {
+        const c = ICAT[x.cat];
+        return `<article class="idea">
+          <h3>${c.icon} ${esc(x.name)}</h3>
+          <p class="meta">${c.label} · Day ${x.day + 1}, ${longDate(T.days[x.day].date)} · ${esc(x.detour)}</p>
+          <p>${esc(x.note)}</p>
+          <div class="btnrow">
+            ${voteBtn(x.id)}
+            <button class="btn" data-addidea="${x.id}" ${inPlan(x.id) ? "disabled" : ""}>${inPlan(x.id) ? "In the plan ✓" : "Add to plan"}</button>
+            <button class="btn" data-showidea="${x.id}">Show on map</button>
+            <a class="btn" href="${dirUrl(x)}" target="_blank" rel="noopener">Directions</a>
+          </div>
+          ${votersLine(x.id)}
+          ${x.src ? `<p class="src">Source: ${esc(x.src)}</p>` : ""}
+        </article>`; }).join("")}
+      ${myIdeas.length ? `<h2 class="legtitle">Stops the family added</h2>${myIdeas.map(sp => {
+        const c = MY_CATS[sp.cat] || MY_CATS.note;
+        return `<article class="idea"><h3>${c.icon} ${esc(sp.name)}</h3>
+          <p class="meta">${c.label}${sp.day !== null && sp.day !== undefined ? ` · Day ${sp.day + 1}` : ""}</p>
+          ${sp.note ? `<p>${esc(sp.note)}</p>` : ""}
+          <div class="btnrow">${voteBtn(sp.id)}<button class="btn" data-showmap="${sp.id}">Show on map</button></div>${votersLine(sp.id)}</article>`; }).join("")}` : ""}
+    </div>`;
+  }
+
+  function refreshAll() {
+    drawMine(); applyFilters(); highlightDay();
+    if (mode === "list") renderList();
+    if (mode === "ideas") renderIdeas();
+  }
+
   // ---------- list mode ----------
   let mode = store.get("mode", "list");
   const legName = i => (i <= 7 ? "Leg 1: Home to Dillon" : i <= 22 ? "Leg 2: Dillon to Big Sky" : "Leg 3: Big Sky to home");
@@ -585,7 +735,7 @@
         <button class="btn" data-showmap="${id}">Show on map</button>
         ${p.link ? `<a class="btn" href="${p.link}" target="_blank" rel="noopener">Trail info</a>` : ""}
         ${canVisit ? `<button class="btn" data-visit="${id}">${done[id] ? "Visited ✓" : "Mark visited"}</button>` : ""}
-        ${isMine ? `<button class="btn" data-edit="${id}">Edit</button>` : ""}
+        ${isMine ? voteBtn(id) + `<button class="btn" data-edit="${id}">Edit</button>` : ""}
       </div></div>`;
   }
 
@@ -635,8 +785,10 @@
     mode = m; store.set("mode", m);
     document.body.classList.toggle("mode-list", m === "list");
     document.body.classList.toggle("mode-map", m === "map");
+    document.body.classList.toggle("mode-ideas", m === "ideas");
     document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === m));
     if (m === "list") renderList();
+    else if (m === "ideas") renderIdeas();
     else { setTimeout(() => { map.invalidateSize(); highlightDay(); }, 0); }
   }
 
@@ -649,12 +801,20 @@
   $("days").onclick = e => {
     const b = e.target.closest("[data-day]"); if (!b) return;
     const di = b.dataset.day === "all" ? null : Number(b.dataset.day);
+    if (mode === "ideas") setMode("list");
     if (mode === "list") { selectedDay = di; renderDays(); if (di === null) $("listView").scrollTo({ top: 0 }); else scrollToDay(di); return; }
     selectDay(di);
   };
   document.addEventListener("click", e => {
     const t = e.target;
     const mb = t.closest("[data-mode]"); if (mb) { setMode(mb.dataset.mode); return; }
+    const vb = t.closest("[data-vote]"); if (vb) { toggleVote(vb.dataset.vote); if (!$("ideasView").offsetParent && document.body.classList.contains("sheet-open")) { const id = vb.dataset.vote; IDEA[id] ? showIdea(id) : showMine(id); } return; }
+    const ai = t.closest("[data-addidea]"); if (ai) { addIdeaToPlan(ai.dataset.addidea); if (mode === "map") showIdea(ai.dataset.addidea); return; }
+    const si = t.closest("[data-showidea]");
+    if (si) { const x = IDEA[si.dataset.showidea]; setMode("map"); if (!filters.ideas) { filters.ideas = true; store.set("filters2", filters); applyFilters(); }
+      setTimeout(() => { selectDay(x.day, false); map.setView([x.lat, x.lng], 11); showIdea(x.id); }, 30); return; }
+    const fb = t.closest("[data-ifilter]"); if (fb) { ideaFilter = fb.dataset.ifilter; store.set("ideaFilter", ideaFilter); renderIdeas(); return; }
+    if (t.id === "saveVoter") { const n = $("voterInput").value.trim(); if (n) { voterName = n.slice(0, 30); store.set("voter", voterName); renderIdeas(); } return; }
     const ex = t.closest("[data-expand]");
     if (ex) { document.querySelectorAll("details.dayc").forEach(d => d.open = ex.dataset.expand === "all"); return; }
     const sm = t.closest("[data-showmap]");
@@ -671,7 +831,7 @@
     const nav = t.closest("[data-nav]"); if (nav) { selectDay(Number(nav.dataset.nav)); return; }
     const gd = t.closest("[data-goday]"); if (gd) { selectDay(Number(gd.dataset.goday)); return; }
     const v = t.closest("[data-visit]");
-    if (v) { const id = v.dataset.visit; done[id] = !done[id]; store.set("done", done); v.textContent = done[id] ? "Visited ✓" : "Mark visited"; const row = v.closest(".prow"); if (row) row.classList.toggle("visited", !!done[id]); return; }
+    if (v) { const id = v.dataset.visit; toggleDone(id); v.textContent = done[id] ? "Visited ✓" : "Mark visited"; const row = v.closest(".prow"); if (row) row.classList.toggle("visited", !!done[id]); return; }
     const ed = t.closest("[data-edit]");
     if (ed) { const s = mine.find(x => x.id === ed.dataset.edit); if (mode === "list") setMode("map"); setTimeout(() => showForm(s), 30); return; }
     const mv = t.closest("[data-move]");
@@ -679,20 +839,49 @@
     const del = t.closest("[data-delete]");
     if (del) {
       const s = mine.find(x => x.id === del.dataset.delete);
-      if (s && confirm(`Delete “${s.name}”?`)) { mine = mine.filter(x => x.id !== s.id); delete markers[s.id]; saveMine(); showDay(); setOpen(false); }
+      if (s && confirm(`Delete “${s.name}”?`)) { mine = mine.filter(x => x.id !== s.id); delete markers[s.id]; saveMine(); syncRemove(s.id); showDay(); setOpen(false); }
       return;
     }
     const chip = t.closest("[data-chip]");
     if (chip) { const g = chip.dataset.chip; filters[g] = !filters[g]; store.set("filters2", filters); chip.setAttribute("aria-pressed", filters[g]); applyFilters(); return; }
     if (t.id === "exportBtn") { exportMine(); return; }
   });
-  document.addEventListener("change", e => { if (e.target.id === "importFile" && e.target.files[0]) importMine(e.target.files[0]); });
+  document.addEventListener("change", e => {
+    if (e.target.id === "importFile" && e.target.files[0]) importMine(e.target.files[0]);
+    if (e.target.id === "ideaSort") { ideaSort = e.target.value; store.set("ideaSort", ideaSort); renderIdeas(); }
+  });
+
+  // ---------- shared sync (optional) ----------
+  window.addEventListener("tripsync-ready", () => {
+    const S = window.TripSync;
+    if (!S || !S.enabled) { if (mode === "ideas") renderIdeas(); return; }
+    shared = true;
+    let first = true;
+    S.onChange(state => {
+      state.firstMerge = first;
+      if (first) {
+        first = false;
+        // Push spots made on this phone before sharing was turned on
+        mine.forEach(sp => { if (!state.spots[sp.id]) S.setSpot(sp); });
+        Object.keys(done).forEach(id => { if (!state.done[id]) S.setDone(id, true); });
+      }
+      if (state.firstMerge) {
+        mine = Object.values(Object.assign({}, ...mine.map(sp => ({ [sp.id]: sp })), state.spots));
+      } else {
+        mine = Object.values(state.spots);
+      }
+      votes = state.votes; done = Object.assign({}, state.done);
+      store.set("mine", mine); store.set("votes", votes); store.set("done", done);
+      refreshAll();
+    });
+    if (mode === "ideas") renderIdeas();
+  });
   map.on("click", () => { if (!document.body.classList.contains("adding")) setOpen(false); });
 
   // ---------- status + start ----------
   const td = todayDiff();
   $("status").textContent = td < 0 ? `${-td} days to go` : td >= T.days.length ? "Trip complete" : `Day ${td + 1} of ${T.days.length}`;
-  drawBuiltIns(); drawMine(); applyFilters();
+  drawBuiltIns(); drawIdeas(); drawMine(); applyFilters();
   map.fitBounds(routeLine.getBounds(), fitPad());
   const startDay = td >= 0 && td < T.days.length ? td : null;
   selectDay(startDay, startDay !== null);
@@ -701,5 +890,6 @@
   if (mode === "list" && startDay !== null) scrollToDay(startDay);
 })();
 </script>
+<script type="module" src="sync.js"></script>
 </body>
 </html>

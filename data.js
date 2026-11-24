@@ -154,6 +154,49 @@ window.TRIP = {
     { date: "2027-07-31", title: "Last ride, then home", ride: { text: "Morning on Allegrippis", places: ["allegrippis"] }, drive: { from: "Raystown", to: "Home", miles: 250, hours: "4.5" }, fun: ["hershey"], stay: "home" }
   ],
 
+
+  // Ideas the family can vote on and add to the plan.
+  // cat: "eat" (fun places to eat), "odd" (odd and fun stops), "view" (views and rest stops)
+  // day: 0 = July 3 ... 28 = July 31
+  ideas: [
+    { id: "texastavern", cat: "eat", day: 0, name: "Texas Tavern, Roanoke, VA", lat: 37.2707, lng: -79.9414, detour: "About 10 minutes off I-81", note: "A tiny lunch counter open since 1930. Order a “cheesy western” and a bowl of chili." },
+    { id: "luray", cat: "odd", day: 0, name: "Great Stalacpipe Organ, Luray Caverns, VA", lat: 38.6643, lng: -78.4836, detour: "About 25 minutes off I-81", note: "A pipe organ that plays the cave itself: mallets tap stalactites to make music." },
+    { id: "sunsphere", cat: "odd", day: 2, name: "Sunsphere, Knoxville", lat: 35.9606, lng: -83.923, detour: "Downtown Knoxville", note: "A giant gold ball left over from the 1982 World’s Fair, with a free observation deck." },
+    { id: "princes", cat: "eat", day: 3, name: "Prince’s Hot Chicken, Nashville", lat: 36.17, lng: -86.78, detour: "In Nashville", note: "The family credited with starting Nashville hot chicken. Ask for plain or mild unless you’re brave." },
+    { id: "googoo", cat: "eat", day: 3, name: "Goo Goo Chocolate Co., Nashville", lat: 36.1596, lng: -86.7749, detour: "Downtown Nashville", note: "Home of the Goo Goo Cluster, the candy bar sold since 1912." },
+    { id: "centralbbq", cat: "eat", day: 4, name: "Central BBQ, Memphis", lat: 35.1302, lng: -90.0465, detour: "A few minutes off I-40", note: "Memphis dry-rub ribs and pulled pork, a good lunch on the long Arkansas day." },
+    { id: "littlerock", cat: "odd", day: 4, name: "The actual little rock, Little Rock, AR", lat: 34.7495, lng: -92.268, detour: "Riverfront Park, near the Billy Bass wall", note: "The city is named for a real little rock on the Arkansas River bank, and you can go see it.", src: "Mental Floss" },
+    { id: "airship", cat: "eat", day: 5, name: "Airship Coffee at Coler", lat: 36.3768, lng: -94.2402, detour: "Inside the Coler preserve", note: "A café in the middle of the bike preserve. Ride up for coffee and snacks between laps." },
+    { id: "gates", cat: "eat", day: 6, name: "Gates Bar-B-Q, Kansas City", lat: 39.0335, lng: -94.5578, detour: "In Kansas City", note: "Kansas City classic where the staff greets you with a loud “Hi, may I help you!” as you walk in." },
+    { id: "bryants", cat: "eat", day: 6, name: "Arthur Bryant’s, Kansas City", lat: 39.0915, lng: -94.556, detour: "In Kansas City", note: "Old-school burnt ends and sauce that has fed presidents." },
+    { id: "cozy", cat: "eat", day: 7, name: "Cozy Inn, Salina, KS", lat: 38.8411, lng: -97.61, detour: "About 5 minutes off I-70", note: "A six-stool diner open since 1922. Onion-loaded sliders sold by the sack, plus chips and soda. That’s the whole menu.", src: "Kansas Sampler Foundation" },
+    { id: "fick", cat: "odd", day: 7, name: "Fick Fossil Museum, Oakley, KS", lat: 39.128, lng: -100.857, detour: "A few minutes off I-70", note: "Fossils and folk art, including pictures made entirely of shark teeth and shells." },
+    { id: "genesee", cat: "view", day: 7, name: "Genesee Park bison herd, CO", lat: 39.709, lng: -105.304, detour: "I-70 exit 254", note: "A bison herd grazes right beside I-70 west of Denver. Pull off and look for them." },
+    { id: "damb", cat: "eat", day: 8, name: "Dillon Dam Brewery", lat: 39.6307, lng: -106.0446, detour: "In Dillon", note: "Big, easy family dinner spot near the rental." },
+    { id: "sapphire", cat: "view", day: 11, name: "Sapphire Point Overlook", lat: 39.586, lng: -106.005, detour: "15 minutes from Dillon", note: "A short, easy loop with views over Dillon Reservoir. A good picnic on the rest day." },
+    { id: "stash", cat: "eat", day: 14, name: "Secret Stash, Crested Butte", lat: 38.8697, lng: -106.9878, detour: "In town", note: "Pizza in a funky old building full of cushions and odd decor." },
+    { id: "hottomato", cat: "eat", day: 16, name: "Hot Tomato Café, Fruita", lat: 39.158, lng: -108.73, detour: "Downtown Fruita", note: "The mountain bikers’ pizza joint in Fruita." },
+    { id: "colonm", cat: "view", day: 17, name: "Colorado National Monument", lat: 39.1032, lng: -108.7349, detour: "West entrance is next to Fruita", note: "Red rock canyon views on Rim Rock Drive. Go early, before the heat." },
+    { id: "sundance", cat: "eat", day: 17, name: "Sundance Resort, Provo Canyon", lat: 40.392, lng: -111.581, detour: "About 5 minutes off US-189", note: "Robert Redford’s mountain resort. The Owl Bar’s old wooden bar came from a Wyoming saloon linked to Butch Cassidy’s gang." },
+    { id: "highwest", cat: "eat", day: 18, name: "High West Saloon, Park City", lat: 40.645, lng: -111.497, detour: "Main Street, Park City", note: "A ski-in saloon in an old livery stable, with a big family-friendly menu." },
+    { id: "fossilbutte", cat: "view", day: 19, name: "Fossil Butte National Monument", lat: 41.855, lng: -110.762, detour: "About 15 minutes off US-30", note: "Fish fossils around 50 million years old, with a visitor center and picnic tables." },
+    { id: "snakecanyon", cat: "view", day: 19, name: "Snake River Canyon overlooks", lat: 43.25, lng: -110.85, detour: "On US-26/89", note: "Pullouts above the whitewater between Alpine and Hoback Junction. Watch the rafts go by." },
+    { id: "persephone", cat: "eat", day: 20, name: "Persephone Bakery, Jackson", lat: 43.4799, lng: -110.758, detour: "In Jackson", note: "Pastries and breakfast before a Teton Pass ride." },
+    { id: "stringlake", cat: "view", day: 20, name: "String Lake, Grand Teton", lat: 43.788, lng: -110.729, detour: "About 30 minutes from Jackson", note: "Shallow, clear lake below the Tetons. Easy swimming and picnic spot." },
+    { id: "firehole", cat: "view", day: 21, name: "Firehole Canyon Drive, Yellowstone", lat: 44.629, lng: -110.864, detour: "Short one-way side road", note: "A canyon drive past Firehole Falls, just off the main road north of Old Faithful." },
+    { id: "corral", cat: "eat", day: 21, name: "Corral Bar, Steakhouse & Motel", lat: 45.16, lng: -111.23, detour: "On US-191 south of Big Sky", note: "Old roadhouse on the drive in from Yellowstone, known for burgers and big portions." },
+    { id: "ousel", cat: "view", day: 22, name: "Ousel Falls, Big Sky", lat: 45.2416, lng: -111.3207, detour: "In Big Sky", note: "A short trail to a waterfall, an easy outing on a rest afternoon." },
+    { id: "greycliff", cat: "view", day: 23, name: "Greycliff Prairie Dog Town State Park, MT", lat: 45.7617, lng: -109.7897, detour: "Right off I-90 at the Greycliff exit", note: "A black-tailed prairie dog colony with picnic tables, 9 miles east of Big Timber. Please don’t feed them.", src: "Visit Montana" },
+    { id: "gamelodge", cat: "eat", day: 23, name: "State Game Lodge, Custer State Park", lat: 43.762, lng: -103.373, detour: "Inside Custer State Park", note: "President Coolidge’s 1927 “Summer White House.” Buffalo is on the menu." },
+    { id: "prairiedog", cat: "odd", day: 24, name: "Giant Prairie Dog, Cactus Flat, SD", lat: 43.861, lng: -101.98, detour: "Just off I-90 on the road to the Badlands", note: "A 12-foot concrete prairie dog, with real ones nearby.", src: "Travel South Dakota" },
+    { id: "pioneerauto", cat: "odd", day: 24, name: "Pioneer Auto Show, Murdo, SD", lat: 43.888, lng: -100.712, detour: "I-90 exit 192", note: "Family-run since 1954, with Elvis Presley’s motorcycle and the General Lee from “The Dukes of Hazzard.”", src: "Travel South Dakota" },
+    { id: "alsoasis", cat: "eat", day: 24, name: "Al’s Oasis, Oacoma, SD", lat: 43.7976, lng: -99.358, detour: "I-90 exit 260", note: "Open since 1919 with 5-cent coffee, buffalo burgers, homemade pie, and a giant buffalo statue out front.", src: "Travel South Dakota" },
+    { id: "rudys", cat: "eat", day: 25, name: "Rudy’s Drive-In, La Crosse", lat: 43.817, lng: -91.229, detour: "A few minutes off I-90", note: "Old-school drive-in with carhops on roller skates and homemade root beer." },
+    { id: "topsecret", cat: "odd", day: 25, name: "Top Secret, Wisconsin Dells", lat: 43.626, lng: -89.78, detour: "On the Dells strip", note: "A full-size White House built upside down, as if it crash-landed." },
+    { id: "packos", cat: "eat", day: 27, name: "Tony Packo’s, Toledo", lat: 41.6427, lng: -83.516, detour: "I-280 exit 9, off the Ohio Turnpike", note: "Hungarian hot dogs under walls of hot dog buns signed by celebrities, including two real buns signed by Jimmy Carter and Walter Mondale.", src: "Roadside America" },
+    { id: "rvhall", cat: "odd", day: 27, name: "RV/MH Hall of Fame, Elkhart, IN", lat: 41.715, lng: -85.978, detour: "Just off the Indiana Toll Road", note: "Vintage campers and motor homes, including some very odd early ones." }
+  ],
+
   checklist: [
     "Book Sylvan Lake in Custer State Park (reservations open a year ahead)",
     "Confirm dates with Rebekah, Aaron’s parents, Bryant, and Wes",
