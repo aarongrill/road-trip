@@ -1,16 +1,24 @@
 # Road Trip 2027
 
-A phone-friendly companion app for our July 2027 mountain bike road trip. Switch between three views with the Map, List, and Ideas buttons under the title. The app opens on the map.
+A phone-friendly companion app for our July 2027 mountain bike road trip. Switch views with the tabs along the bottom: Today, Map, List, and Ideas. Before the trip it opens on the map; from July 3 to 31 it opens on Today.
+
+## Today
+
+The screen for the road. It shows the current day: the drive with a "Navigate the day" button (Google Maps with the day's stops in route order, ending at tonight's stop), the day's stops in order with the next one highlighted and a "Mark done" button, tonight's stop with directions, ideas along the route, and a preview of tomorrow.
+
+"Near me" finds the closest food, swim stops, attractions, views, or places to sleep from the trip data, using your location (or tonight's stop if location is off), with a Google Maps search for more. Gas opens a live Google Maps search.
+
+Before the trip, Today previews Day 1. Tap any day in the strip at the top to look at that day; tap "All" to go back.
 
 ## Filters
 
-The row of buttons under Map, List, and Ideas narrows every view at once: 🍴 Food, 🎡 Attractions, 🚵 Biking, 🏊 Swimming, 🏞️ Views & rest stops, and 🛏️ Sleep. Tap "All" to see everything. "💡 Ideas on/off" shows or hides the stops the family can vote on. In the List, days with nothing in the chosen category are hidden, and the rest open automatically.
+Tap "☰ Filter" at the top left to narrow every view at once: 🍴 Food, 🎡 Attractions, 🚵 Biking, 🏊 Swimming, 🏞️ Views & rest stops, and 🛏️ Sleep. Tap "All" to see everything. "💡 Ideas on/off" shows or hides the stops the family can vote on. In the List, days with nothing in the chosen category are hidden, and the rest open automatically.
 
 ## Links
 
-Every attraction, restaurant, ride, swim stop, and place to stay has a 🔗 link in all three views. If a stop has a `web` address in `data.js`, the link opens that website. Otherwise it opens the stop's Google Maps listing, which shows the website, hours, phone number, and photos. Rides also keep their "Trail info" link. To add a website for any stop, add `web: "https://..."` to it in `data.js`.
+Every attraction, restaurant, ride, swim stop, and place to stay has a 🔗 link in every view. If a stop has a `web` address in `data.js`, the link opens that website. Otherwise it opens the stop's Google Maps listing, which shows the website, hours, phone number, and photos. Rides also keep their "Trail info" link. To add a website for any stop, add `web: "https://..."` to it in `data.js`.
 
-## The three views
+## Map, List, and Ideas
 
 **Map**
 - The trip is split into 12 smaller legs (for example "Memphis to Bentonville" or "Jackson and the Tetons"). The bottom panel shows one leg at a time; use ◀ and ▶ to move between legs, or pick one from the list on the whole-trip screen.
@@ -40,12 +48,14 @@ Every attraction, restaurant, ride, swim stop, and place to stay has a 🔗 link
 
 ## Files
 
-Upload all five files to the top level of the repo:
+Upload these files to the top level of the repo:
 
 - `index.html`: the app
 - `data.js`: the plan, the ideas list, and the checklist (edit this to change anything)
 - `config.js`: settings for sharing votes and spots (see below)
 - `sync.js`: the code that shares votes and spots when sharing is turned on
+- `sw.js`: saves the app on the phone so it works without a signal
+- `manifest.json`, `icon-192.png`, `icon-512.png`: let the app be added to the home screen with its own icon
 - `README.md`: this file
 - `tools/build-route.mjs`: optional script that builds `route-geometry.js` (see "Route along real roads")
 
@@ -55,6 +65,17 @@ Upload all five files to the top level of the repo:
 2. Go to Settings > Pages. Set Source to "Deploy from a branch," pick `main` and `/ (root)`, and save.
 3. For a custom domain, enter it under Settings > Pages > Custom domain, then add the DNS records GitHub lists.
 4. Once the domain works, check "Enforce HTTPS." The ◎ location button only works over HTTPS.
+
+## Offline use and installing on a phone
+
+Much of the route has little or no cell service, so the app saves itself on each phone.
+
+- **Install it:** On iPhone, open the site in Safari, tap Share, then "Add to Home Screen." On Android, open it in Chrome and tap "Install app" or "Add to Home screen." It then opens full screen like an app.
+- **What works offline:** the plan, ideas, votes, filters, Today, List, and Ideas. "Done" marks and votes are saved on the phone.
+- **Map tiles:** The app saves map areas as you view them, up to about 3,000 tiles. OpenStreetMap's rules don't allow downloading maps in bulk, so before the trip, open each leg on the Map tab while on Wi-Fi and zoom in on the places you'll need. Areas you haven't viewed show a blank background offline, with the route and pins still drawn.
+- **Links and directions** (Google Maps, websites) need a signal, though Google Maps works offline if you download areas in the Google Maps app itself.
+- An "Offline" bar appears at the top when there's no connection.
+- **Updates:** When you upload new files, the app checks for them each time it opens with a signal, so you no longer need a hard refresh.
 
 ## Route along real roads
 
@@ -108,6 +129,6 @@ A GitHub Pages site is public to anyone with the link, and a public repository s
 ## Notes
 
 - The map uses OpenStreetMap tiles and the Leaflet library, so it needs a data connection.
-- After uploading new files, refresh the page. If a phone still shows the old version, close the tab and open the site again.
+- After uploading new files, reopen the app with a signal to get the update.
 - Drive times, distances, coordinates, and hours are approximate. Check each idea's hours before you go; some details came from travel guides and may have changed.
 - Parts of this app and its data were drafted with AI assistance, so double-check details before relying on them.

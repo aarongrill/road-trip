@@ -6,7 +6,10 @@
 <meta name="theme-color" content="#2F5D3A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Road Trip 2027</title>
-<!-- App version 13 -->
+<!-- App version 14 -->
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
@@ -275,6 +278,74 @@
   .prow .pnote { color: var(--muted); margin: 2px 0 6px; font-size: 0.94rem; }
   .prow.visited .pn { text-decoration: line-through; }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  /* ===== v14: slim header, bottom tabs, Today view ===== */
+  :root { --tab-h: calc(60px + env(safe-area-inset-bottom, 0px)); }
+  .bar .row, .bar .modes { display: none !important; }
+  .toprow { display: flex; align-items: center; gap: 6px; padding: 8px 0 8px 10px; padding-top: calc(8px + env(safe-area-inset-top, 0px) * 0); }
+  .toprow .days { flex: 1; padding: 0 10px 0 2px; }
+  .filterbtn { flex: none; border: 1px solid rgba(255,255,255,.5); background: rgba(255,255,255,.12); color: #fff; border-radius: 12px;
+    padding: 6px 10px; cursor: pointer; font-weight: 700; line-height: 1.1; text-align: center; min-height: 44px; }
+  .filterbtn small { display: block; font-weight: 400; font-size: 0.72rem; opacity: 0.9; }
+  .filterbtn.active { background: #fff; color: var(--forest); }
+  .navcats { position: absolute; left: 0; right: 0; top: 100%; display: none; flex-wrap: wrap; gap: 8px; padding: 10px 12px 14px;
+    background: var(--forest); box-shadow: 0 6px 12px rgba(0,0,0,.25); overflow: visible; }
+  @media (prefers-color-scheme: dark) { .navcats { background: #1E3A27; } }
+  body.filters-open .navcats { display: flex; }
+  .navcats button { padding: 8px 14px; font-size: 0.95rem; }
+  .navcats .sep { display: none; }
+  .navcats .ideastoggle { margin-left: auto; }
+  .offline { background: #6B4E16; color: #fff; text-align: center; font-size: 0.85rem; padding: 3px 8px; }
+
+  .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 700; height: var(--tab-h); padding-bottom: env(safe-area-inset-bottom, 0px);
+    display: grid; grid-template-columns: repeat(4, 1fr); background: var(--surface); border-top: 1px solid var(--line); box-shadow: 0 -2px 8px rgba(0,0,0,.08); }
+  .tabs button { border: 0; background: transparent; color: var(--muted); font-size: 0.78rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+  .tabs button span { font-size: 1.35rem; line-height: 1; filter: grayscale(0.6); }
+  .tabs button[aria-pressed="true"] { color: var(--forest); box-shadow: inset 0 3px 0 var(--forest); }
+  .tabs button[aria-pressed="true"] span { filter: none; }
+
+  #map { bottom: var(--tab-h); }
+  .sheet { bottom: var(--tab-h); padding-bottom: 0; }
+  body.sheet-open .sheet { height: 45vh; }
+  body.sheet-open.sheet-full .sheet { height: 80vh; }
+  .fab { bottom: calc(var(--sheet-peek) + var(--tab-h) + 16px); }
+  .locate { bottom: calc(var(--sheet-peek) + var(--tab-h) + 76px); }
+  .placebar { bottom: calc(var(--tab-h) + 16px); }
+  #listView { padding-bottom: calc(var(--tab-h) + 24px); }
+  #ideasView { padding-bottom: calc(var(--tab-h) + 24px); }
+  @media (min-width: 900px), (orientation: landscape) and (min-width: 640px) {
+    .sheet, body.sheet-open .sheet, body.sheet-open.sheet-full .sheet { bottom: var(--tab-h); height: auto; }
+    .fab, body.sheet-open .fab { bottom: calc(var(--tab-h) + 16px); }
+    .locate, body.sheet-open .locate { bottom: calc(var(--tab-h) + 76px); }
+    #pmap { height: calc(100vh - var(--bar-h, 150px) - var(--tab-h) - 90px); }
+  }
+
+  /* Today view */
+  #todayView { display: none; position: fixed; inset: 0; z-index: 450; overflow-y: auto; background: var(--bg);
+    padding: calc(var(--bar-h, 70px) + 12px) 0 calc(var(--tab-h) + 24px); -webkit-overflow-scrolling: touch; }
+  body.mode-today #todayView { display: block; }
+  body.mode-today #map, body.mode-today .fab, body.mode-today .locate, body.mode-today .sheet, body.mode-today .crosshair,
+  body.mode-today .placebar, body.mode-today #listView, body.mode-today #ideasView { display: none !important; }
+  body:not(.mode-today) #todayView { display: none; }
+  .tcard { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+  .tcard h3 { font-size: 1.2rem; color: var(--forest); margin-bottom: 6px; }
+  .tcard p { margin: 0 0 8px; }
+  .tbanner { border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; background: var(--road); color: #fff; }
+  .tbanner b { display: block; font-size: 1.05rem; }
+  .tstop { display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+  .tstop:first-of-type { border-top: 0; }
+  .tstop .ic { font-size: 1.3rem; text-align: center; }
+  .tstop .k { color: var(--muted); font-size: 0.82rem; }
+  .tstop .n { font-weight: 700; }
+  .tstop.next { background: color-mix(in srgb, var(--road) 9%, transparent); border-radius: 10px; padding: 10px 8px; }
+  .tstop.next .k { color: var(--road); font-weight: 700; }
+  .tstop.visited .n { text-decoration: line-through; color: var(--muted); }
+  .tstop .btnrow { margin-top: 6px; }
+  .nearbtns { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .nearbtns button[aria-pressed="true"] { background: var(--forest); color: #fff; border-color: var(--forest); }
+  .nearrow { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+  .nearrow:first-child { border-top: 0; }
+  .nearrow .dist { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -291,11 +362,22 @@
 <div id="ideasView" aria-label="Ideas and votes"></div>
 
 <header class="bar">
-  <div class="row"><h1>Road Trip 2027</h1><span class="status" id="status"></span></div>
-  <div class="modes" role="group" aria-label="Choose a view"><button data-mode="map" aria-pressed="true"><span aria-hidden="true">🗺️</span> Map</button><button data-mode="list" aria-pressed="false"><span aria-hidden="true">📋</span> List</button><button data-mode="ideas" aria-pressed="false"><span aria-hidden="true">💡</span> Ideas</button></div>
+  <span id="status" hidden></span>
+  <div class="toprow">
+    <button class="filterbtn" id="filterBtn" aria-expanded="false" aria-controls="navcats"></button>
+    <div class="days" id="days" aria-label="Choose a day"></div>
+  </div>
   <div class="navcats" id="navcats" role="group" aria-label="Show only"></div>
-  <div class="days" id="days" aria-label="Choose a day"></div>
+  <div class="offline" id="offlineNote" hidden>Offline: showing the saved plan</div>
 </header>
+
+<nav class="tabs" aria-label="Views">
+  <button data-mode="today" aria-pressed="false"><span aria-hidden="true">📍</span>Today</button>
+  <button data-mode="map" aria-pressed="true"><span aria-hidden="true">🗺️</span>Map</button>
+  <button data-mode="list" aria-pressed="false"><span aria-hidden="true">📋</span>List</button>
+  <button data-mode="ideas" aria-pressed="false"><span aria-hidden="true">💡</span>Ideas</button>
+</nav>
+<div id="todayView" aria-label="Today"></div>
 
 <button class="locate" id="locateBtn" aria-label="Show where I am">◎</button>
 <button class="fab" id="addBtn">+ Add a spot</button>
@@ -314,9 +396,9 @@
   <div class="sheet-body" id="sheetBody"></div>
 </section>
 
-<script src="config.js?v=13"></script>
-<script src="data.js?v=13"></script>
-<script src="route-geometry.js?v=13" onerror="window.ROUTE_GEOMETRY = null"></script>
+<script src="config.js?v=14"></script>
+<script src="data.js?v=14"></script>
+<script src="route-geometry.js?v=14" onerror="window.ROUTE_GEOMETRY = null"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function () {
@@ -392,7 +474,7 @@
   // ---------- map ----------
   const map = L.map("map", { zoomControl: false, tap: true });
   L.control.zoom({ position: "topleft" }).addTo(map);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(map);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, crossOrigin: true, attribution: "&copy; OpenStreetMap contributors" }).addTo(map);
   const routeLine = L.polyline(T.route, { color: "#1D4E89", weight: 4, opacity: 0.65, dashArray: "6 8" }).addTo(map);
   loadRoadRoute();
 
@@ -488,17 +570,26 @@
     Object.entries(markers).forEach(([id, m]) => (matches(id) && (!inStage || inStage.has(id))) ? m.addTo(map) : map.removeLayer(m));
     highlightDay();
   }
+  function renderFilterBtn() {
+    const cur = NAV.find(([k]) => k === navCat);
+    const b = $("filterBtn");
+    b.innerHTML = navCat === "all" ? `☰ Filter<small>${showIdeas ? "All + ideas" : "All"}</small>` : `${cur[1].split(" ")[0]} Filter<small>${cur[1].split(" ").slice(1).join(" ")}</small>`;
+    b.classList.toggle("active", navCat !== "all");
+    b.setAttribute("aria-label", "Filter: " + (navCat === "all" ? "showing everything" : cur[1]) + (showIdeas ? ", ideas on" : ", ideas off"));
+  }
   function renderNav() {
+    renderFilterBtn();
     $("navcats").innerHTML = NAV.map(([k, l]) => `<button data-cat="${k}" aria-pressed="${navCat === k}">${l}</button>`).join("") +
       `<span class="sep" aria-hidden="true"></span><button class="ideastoggle" data-ideastoggle="1" aria-pressed="${showIdeas}">💡 Ideas ${showIdeas ? "on" : "off"}</button>`;
   }
   function setNav(cat, ideas) {
-    if (cat !== undefined) { navCat = cat; store.set("navcat", navCat); }
+    if (cat !== undefined) { navCat = cat; store.set("navcat", navCat); document.body.classList.remove("filters-open"); $("filterBtn").setAttribute("aria-expanded", "false"); }
     if (ideas !== undefined) { showIdeas = ideas; store.set("showIdeas", showIdeas); }
     renderNav(); applyFilters();
     if (mode === "list") { renderList(undefined, true); refreshPreview(); }
     if (mode === "map" && activeStage !== null && !document.querySelector("#sheetBody .detail, #sheetBody form")) renderStageSheet();
     if (mode === "ideas") renderIdeas();
+    if (mode === "today") renderToday();
   }
 
   // Keep a point visible above the bottom sheet and below the top bar
@@ -507,15 +598,16 @@
   function sheetHeight() {
     if (isSplit()) return 0;
     const b = document.body.classList;
-    return b.contains("sheet-open") ? window.innerHeight * (b.contains("sheet-full") ? 0.88 : 0.5) : 150;
+    return b.contains("sheet-open") ? window.innerHeight * (b.contains("sheet-full") ? 0.8 : 0.45) : 150;
   }
   function focusOn(lat, lng) {
     if (isSplit()) { map.panTo([lat, lng]); return; }
     const sheetH = sheetHeight();
     const topH = document.querySelector(".bar").offsetHeight;
-    const targetY = (topH + (window.innerHeight - sheetH)) / 2;
+    const tabH = document.querySelector(".tabs").offsetHeight, mapH = window.innerHeight - tabH;
+    const targetY = (topH + (mapH - sheetH)) / 2;
     map.panTo([lat, lng], { animate: false });
-    map.panBy([0, window.innerHeight / 2 - targetY], { animate: true });
+    map.panBy([0, mapH / 2 - targetY], { animate: true });
   }
   const fitPad = () => ({ paddingTopLeft: [30, document.querySelector(".bar").offsetHeight + 30], paddingBottomRight: [30, isSplit() ? 30 : sheetHeight() + 20] });
 
@@ -663,7 +755,7 @@
     const sh = $("sheet"), h = sh.offsetHeight, H = window.innerHeight;
     sh.classList.remove("dragging"); sh.style.height = "";
     if (dragMoved) {
-      const opts = [["peek", 150], ["half", H * 0.5], ["full", H * 0.88]];
+      const opts = [["peek", 150], ["half", H * 0.45], ["full", H * 0.8]];
       setSheet(opts.reduce((a, b) => Math.abs(b[1] - h) < Math.abs(a[1] - h) ? b : a)[0]);
     }
     dragStart = null; setTimeout(() => { dragMoved = false; }, 50);
@@ -714,7 +806,7 @@
         <h3 class="section-title">My spots (${mine.length})</h3>
         ${mine.length ? `<ul class="stops">${mine.map(s => stopItem(s.id, s.day === null || s.day === undefined ? (MY_CATS[s.cat] || MY_CATS.note).label : `Day ${s.day + 1} · ${(MY_CATS[s.cat] || MY_CATS.note).label}`)).join("")}</ul>`
           : `<p class="fineprint">Nothing added yet. Tap “+ Add a spot” to drop a pin anywhere on the map.</p>`}
-        <p class="fineprint">App version 13 (side-by-side map and links)</p>
+        <p class="fineprint">App version 14 (Today view, offline, bottom tabs)</p>
         <h3 class="section-title">Share my spots</h3>
         <p class="fineprint">Spots are saved on this phone. To share them, export a file and import it on another phone.</p>
         <div class="btnrow">
@@ -1003,6 +1095,7 @@
     if (mode === "map" && activeStage !== null && !document.querySelector("#sheetBody .detail, #sheetBody form")) renderStageSheet();
     if (mode === "list") renderList();
     if (mode === "ideas") renderIdeas();
+    if (mode === "today") renderToday();
   }
 
   // ---------- list mode ----------
@@ -1121,12 +1214,15 @@
     document.body.classList.toggle("mode-list", m === "list");
     document.body.classList.toggle("mode-map", m === "map");
     document.body.classList.toggle("mode-ideas", m === "ideas");
+    document.body.classList.toggle("mode-today", m === "today");
+    document.body.classList.remove("filters-open");
     document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === m));
     if (m === "list") {
       renderList(); initPreview();
       setTimeout(() => { if (activeDay === null && !activeLeg) { const td = todayDiff(); previewDay(td >= 0 && td < T.days.length ? td : (Number((document.querySelector("details.dayc[open]") || {}).dataset?.i) || 0)); } else refreshPreview(); }, 60);
     }
     else if (m === "ideas") renderIdeas();
+    else if (m === "today") renderToday();
     else { setTimeout(() => { map.invalidateSize(); highlightDay(); }, 0); }
   }
 
@@ -1137,7 +1233,7 @@
   function initPreview() {
     if (pmap) { setTimeout(() => pmap.invalidateSize(), 0); return; }
     pmap = L.map("pmap", { zoomControl: true, scrollWheelZoom: false });
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(pmap);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, crossOrigin: true, attribution: "&copy; OpenStreetMap contributors" }).addTo(pmap);
     pLayer = L.layerGroup().addTo(pmap);
     pmap.fitBounds(routeLine.getBounds(), { padding: [10, 10] });
   }
@@ -1232,10 +1328,165 @@
     previewDay(i);
   }
 
+
+  // ---------- Today view ----------
+  let todayPick = null, nearCat = null, lastPos = null, nearNote = "";
+  const miles = (a, b) => {
+    const R = 3958.8, toR = x => x * Math.PI / 180;
+    const dLat = toR(b[0] - a[0]), dLng = toR(b[1] - a[1]);
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(toR(a[0])) * Math.cos(toR(b[0])) * Math.sin(dLng / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  };
+  function todayIndex() {
+    if (todayPick !== null) return todayPick;
+    const td = todayDiff();
+    return td < 0 ? 0 : td >= T.days.length ? T.days.length - 1 : td;
+  }
+  // Put a day's stops in the order you reach them along the route
+  function routeOrder(ids) {
+    const pts = routeLine.getLatLngs();
+    const pos = id => { const ll = itemLatLng(id); if (!ll) return 0; let best = 0, bd = Infinity;
+      for (let k = 0; k < pts.length; k += 2) { const d = (pts[k].lat - ll[0]) ** 2 + (pts[k].lng - ll[1]) ** 2; if (d < bd) { bd = d; best = k; } } return best; };
+    return ids.map(id => [id, pos(id)]).sort((a, b) => a[1] - b[1]).map(x => x[0]);
+  }
+  function stopLabel(id, d) {
+    if (IDEA[id] && !P[id]) return `Idea · ${ICAT[IDEA[id].cat].label}`;
+    if (!P[id]) return "Added stop";
+    const t = P[id].type;
+    if (id === d.stay) return "Tonight";
+    const meal = (d.meals || []).find(([, mid]) => mid === id);
+    if (meal) return meal[0];
+    return t === "ride" ? "Ride" : t === "fun" ? "Fun stop" : (KIND[t] || {}).label || "";
+  }
+  function itemName(id) { const p = P[id] || IDEA[id] || mine.find(s => s.id === id); return p ? p.name : ""; }
+  function itemIconText(id) {
+    if (IDEA[id] && !P[id]) return ICAT[IDEA[id].cat].icon;
+    const sp = !P[id] && mine.find(s => s.id === id); if (sp) return (MY_CATS[sp.cat] || MY_CATS.note).icon;
+    const p = P[id]; return p.emoji || (KIND[p.type] || {}).icon || "📍";
+  }
+
+  function renderToday() {
+    const td = todayDiff(), live = td >= 0 && td < T.days.length;
+    const i = todayIndex(), d = T.days[i], st = STAGES[stageOf(i)];
+    const isToday = live && i === td;
+    let banner;
+    if (todayPick !== null && !isToday) banner = `<b>Looking at Day ${i + 1}</b>${live ? `Today is Day ${td + 1}. Tap “All” in the day strip to go back to today.` : "Tap “All” in the day strip to go back."}`;
+    else if (td < 0) banner = `<b>${-td} days until the trip</b>This is a preview of Day 1. During the trip, this screen opens to that day automatically.`;
+    else if (td >= T.days.length) banner = `<b>Trip complete</b>Showing the last day.`;
+    else banner = `<b>Today: Day ${td + 1} of ${T.days.length}</b>${esc(st ? "Leg " + (stageOf(i) + 1) + ": " + st.title : "")}`;
+
+    // planned stops for the day (not ideas), in route order on driving days
+    let stops = [...(d.ride ? d.ride.places : []), ...(d.meals || []).map(m => m[1]), ...(d.fun || []), ...(d.extra || []), ...mine.filter(s => s.day === i).map(s => s.id)]
+      .filter((id, k, a) => a.indexOf(id) === k && id !== d.stay);
+    if (d.drive) stops = routeOrder(stops);
+    const nextId = stops.find(id => !done[id]);
+    const stay = P[d.stay];
+
+    let navUrl = "";
+    if (d.drive && stay) {
+      const wps = stops.map(itemLatLng).filter(Boolean).slice(0, 8).map(ll => `${ll[0]},${ll[1]}`).join("|");
+      navUrl = `https://www.google.com/maps/dir/?api=1&destination=${stay.lat},${stay.lng}&travelmode=driving${wps ? "&waypoints=" + encodeURIComponent(wps) : ""}`;
+    }
+    const dayIdeas = showIdeas ? IDEAS.filter(x => x.day === i) : [];
+    const tomorrow = T.days[i + 1];
+
+    $("todayView").innerHTML = `<div class="listwrap">
+      <div class="tbanner">${banner}</div>
+      <div class="head">${shield(i + 1)}<div><h2>${esc(d.title)}</h2><p>${longDate(d.date)}</p></div></div>
+
+      ${d.drive ? `<div class="tcard"><h3>🚗 The drive</h3>
+        <p>${esc(d.drive.from)} to ${esc(d.drive.to)}, about ${d.drive.miles} miles and ${d.drive.hours} hours.</p>
+        <div class="btnrow">${navUrl ? `<a class="btn primary" href="${navUrl}" target="_blank" rel="noopener">Navigate the day</a>` : ""}
+          ${stay ? `<a class="btn" href="${dirUrl(stay)}" target="_blank" rel="noopener">Straight to tonight’s stop</a>` : ""}</div>
+        ${stops.length ? `<p class="fineprint" style="margin-top:8px">“Navigate the day” opens Google Maps with today’s stops in route order, ending at tonight’s stop.</p>` : ""}
+      </div>` : ""}
+      ${d.note ? `<div class="tcard"><h3>⚠️ Heads up</h3><p>${esc(d.note)}</p></div>` : ""}
+      ${d.ride ? `<div class="tcard"><h3>🚵 Riding</h3><p>${esc(d.ride.text)}</p></div>` : ""}
+
+      <div class="tcard"><h3>Today’s stops</h3>
+        ${stops.length ? stops.map(id => {
+          const p = P[id] || mine.find(s => s.id === id);
+          return `<div class="tstop ${id === nextId ? "next" : ""} ${done[id] ? "visited" : ""}">
+            <span class="ic" aria-hidden="true">${itemIconText(id)}</span>
+            <div><div class="k">${id === nextId ? "Next · " : ""}${esc(stopLabel(id, d))}</div><div class="n">${esc(p.name)}</div>
+              ${p.note ? `<div class="fineprint">${esc(p.note)}</div>` : ""}
+              <div class="btnrow">
+                <a class="btn" href="${dirUrl(p)}" target="_blank" rel="noopener">Directions</a>
+                ${p.link ? `<a class="btn" href="${p.link}" target="_blank" rel="noopener">Trail info</a>` : ""}
+                ${infoLink(p)}
+                <button class="btn" data-visit="${id}" data-today="1">${done[id] ? "Done ✓" : "Mark done"}</button>
+              </div></div></div>`; }).join("")
+          : `<p class="fineprint">No planned stops besides tonight’s. Check “Near me” below or the ideas for today.</p>`}
+      </div>
+
+      ${stay ? `<div class="tcard"><h3>${(KIND[stay.type] || {}).icon || "🛏️"} Tonight</h3>
+        <p><b>${esc(stay.name)}</b>${stay.note ? `<br><span class="fineprint">${esc(stay.note)}</span>` : ""}</p>
+        <div class="btnrow"><a class="btn primary" href="${dirUrl(stay)}" target="_blank" rel="noopener">Directions</a>${infoLink(stay)}</div>
+      </div>` : ""}
+
+      <div class="tcard"><h3>📍 Near me</h3>
+        <div class="nearbtns">
+          ${[["eat", "🍴 Food"], ["swim", "🏊 Swim"], ["see", "🎡 Attractions"], ["view", "🏞️ Views"], ["gas", "⛽ Gas"], ["sleep", "🛏️ Sleep"]].map(([k, l]) =>
+            `<button class="btn" data-near="${k}" aria-pressed="${nearCat === k}">${l}</button>`).join("")}
+        </div>
+        <div id="nearList">${nearCat ? nearHTML() : `<p class="fineprint">Pick a category to see the closest stops from the plan and ideas, plus a Google Maps search for more.</p>`}</div>
+      </div>
+
+      ${dayIdeas.length ? `<div class="tcard"><h3>💡 Ideas along today’s route</h3>
+        ${dayIdeas.map(x => `<div class="tstop"><span class="ic" aria-hidden="true">${ICAT[x.cat].icon}</span><div>
+          <div class="k">${ICAT[x.cat].label} · ${esc(x.detour)}</div><div class="n">${esc(x.name)}</div>
+          <div class="btnrow">${voteBtn(x.id)}<a class="btn" href="${dirUrl(x)}" target="_blank" rel="noopener">Directions</a>${infoLink(x)}</div></div></div>`).join("")}
+      </div>` : ""}
+
+      ${tomorrow ? `<div class="tcard"><h3>Tomorrow</h3><p><b>Day ${i + 2}: ${esc(tomorrow.title)}</b><br>
+        <span class="fineprint">${tomorrow.drive ? `${esc(tomorrow.drive.from)} to ${esc(tomorrow.drive.to)}, ${tomorrow.drive.miles} mi` : "No long drive"}</span></p>
+        <button class="btn" data-todaypick="${i + 1}">See tomorrow</button></div>` : ""}
+
+      <p class="fineprint">${offlineReady ? "✓ Saved for offline use: the plan, ideas, and any map areas you’ve already viewed." : "Open this site once on Wi-Fi so it’s saved for offline use."}</p>
+    </div>`;
+  }
+
+  function nearHTML() {
+    const q = { eat: "restaurants", swim: "swimming", see: "things to do", view: "scenic overlook", gas: "gas station", sleep: "campground OR hotel" }[nearCat];
+    const more = `<a class="btn" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}" target="_blank" rel="noopener">Search Google Maps nearby</a>`;
+    if (nearCat === "gas") return `<p class="fineprint">Gas isn’t in the trip data, so this opens a live search around you.</p><div class="btnrow">${more}</div>`;
+    const d = T.days[todayIndex()];
+    const ref = lastPos || (P[d.stay] ? [P[d.stay].lat, P[d.stay].lng] : null);
+    if (!ref) return `<div class="btnrow">${more}</div>`;
+    const ids = [...Object.keys(P).filter(id => !["host", "home", "airport"].includes(P[id].type)), ...IDEAS.map(x => x.id), ...mine.map(s => s.id)];
+    const list = ids.filter(id => catsOf(id).has(nearCat))
+      .map(id => [id, miles(ref, itemLatLng(id))]).sort((a, b) => a[1] - b[1]).slice(0, 6);
+    return `<p class="fineprint">${esc(nearNote)}</p>` + list.map(([id, m]) => {
+      const p = P[id] || IDEA[id] || mine.find(s => s.id === id);
+      return `<div class="nearrow"><div><b>${itemIconText(id)} ${esc(p.name)}</b><br><span class="dist">${m < 10 ? m.toFixed(1) : Math.round(m)} mi away${IDEA[id] && !P[id] ? " · idea" : ""}</span></div>
+        <div class="btnrow" style="flex:none"><a class="btn" href="${dirUrl(p)}" target="_blank" rel="noopener" aria-label="Directions to ${esc(p.name)}">Go</a></div></div>`;
+    }).join("") + `<div class="btnrow" style="margin-top:8px">${more}</div>`;
+  }
+  function pickNear(cat) {
+    nearCat = cat;
+    const done2 = () => { if (mode === "today") renderToday(); };
+    if (cat === "gas") { done2(); return; }
+    if (!navigator.geolocation) { nearNote = "Distances are from tonight’s stop."; done2(); return; }
+    nearNote = "Finding your location…"; done2();
+    navigator.geolocation.getCurrentPosition(pos => {
+      lastPos = [pos.coords.latitude, pos.coords.longitude]; nearNote = "Distances are from where you are now."; done2();
+    }, () => { lastPos = null; nearNote = "Location is off, so distances are from tonight’s stop."; done2(); },
+    { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 });
+  }
+
+  // ---------- offline ----------
+  let offlineReady = false;
+  function updateOnline() { $("offlineNote").hidden = navigator.onLine; setBarHeight(); }
+  window.addEventListener("online", updateOnline); window.addEventListener("offline", updateOnline);
+  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+    navigator.serviceWorker.register("sw.js").then(() => navigator.serviceWorker.ready).then(() => { offlineReady = true; if (mode === "today") renderToday(); }).catch(() => {});
+  }
+
   // ---------- events ----------
   $("days").onclick = e => {
     const b = e.target.closest("[data-day]"); if (!b) return;
     const di = b.dataset.day === "all" ? null : Number(b.dataset.day);
+    if (mode === "today") { todayPick = di; selectedDay = di; renderDays(); renderToday(); $("todayView").scrollTo({ top: 0 }); return; }
     if (mode === "ideas") setMode("list");
     if (mode === "list") { selectedDay = di; renderDays(); if (di === null) $("listView").scrollTo({ top: 0 }); else scrollToDay(di); return; }
     selectDay(di);
@@ -1243,6 +1494,8 @@
   document.addEventListener("click", e => {
     const t = e.target;
     const mb = t.closest("[data-mode]"); if (mb) { setMode(mb.dataset.mode); return; }
+    const nb = t.closest("[data-near]"); if (nb) { pickNear(nb.dataset.near); return; }
+    const tp = t.closest("[data-todaypick]"); if (tp) { todayPick = Number(tp.dataset.todaypick); selectedDay = todayPick; renderDays(); renderToday(); $("todayView").scrollTo({ top: 0 }); return; }
     const sg = t.closest("[data-stage]");
     if (sg) { const v = sg.dataset.stage; selectedDay = null; renderDays(); if (v !== "all") setOpen(true); showStage(v === "all" ? null : Number(v)); return; }
     const fd = t.closest("[data-focusday]");
@@ -1258,6 +1511,8 @@
     if (si) { const x = IDEA[si.dataset.showidea]; setMode("map"); if (!matches(x.id)) setNav(catMatch(x.id) ? undefined : "all", true);
       setTimeout(() => { selectDay(x.day, false); map.setView([x.lat, x.lng], 11); showIdea(x.id); }, 30); return; }
     const nc = t.closest("[data-cat]"); if (nc) { setNav(nc.dataset.cat); return; }
+    if (t.closest("#filterBtn")) { const open = document.body.classList.toggle("filters-open"); $("filterBtn").setAttribute("aria-expanded", String(open)); return; }
+    if (document.body.classList.contains("filters-open") && !t.closest("#navcats")) { document.body.classList.remove("filters-open"); $("filterBtn").setAttribute("aria-expanded", "false"); }
     if (t.closest("[data-ideastoggle]")) { setNav(undefined, !showIdeas); return; }
     if (t.id === "saveVoter") { const n = $("voterInput").value.trim(); if (n) { voterName = n.slice(0, 30); store.set("voter", voterName); renderIdeas(); } return; }
     const ex = t.closest("[data-expand]");
@@ -1277,7 +1532,7 @@
     const nav = t.closest("[data-nav]"); if (nav) { selectDay(Number(nav.dataset.nav)); return; }
     const gd = t.closest("[data-goday]"); if (gd) { selectDay(Number(gd.dataset.goday)); return; }
     const v = t.closest("[data-visit]");
-    if (v) { const id = v.dataset.visit; toggleDone(id); v.textContent = done[id] ? "Visited ✓" : "Mark visited"; const row = v.closest(".prow"); if (row) row.classList.toggle("visited", !!done[id]); return; }
+    if (v) { const id = v.dataset.visit; toggleDone(id); if (v.dataset.today) { renderToday(); return; } v.textContent = done[id] ? "Visited ✓" : "Mark visited"; const row = v.closest(".prow"); if (row) row.classList.toggle("visited", !!done[id]); return; }
     const ed = t.closest("[data-edit]");
     if (ed) { const s = mine.find(x => x.id === ed.dataset.edit); if (mode === "list") setMode("map"); setTimeout(() => showForm(s), 30); return; }
     const mv = t.closest("[data-move]");
@@ -1339,10 +1594,12 @@
   const startDay = td >= 0 && td < T.days.length ? td : null;
   selectDay(startDay, startDay !== null);
   setBarHeight(); window.addEventListener("resize", setBarHeight);
+  updateOnline();
+  if (startDay !== null) mode = "today";  // during the trip, open to Today
   setMode(mode);
   if (mode === "list" && startDay !== null) scrollToDay(startDay);
 })();
 </script>
-<script type="module" src="sync.js?v=13"></script>
+<script type="module" src="sync.js?v=14"></script>
 </body>
 </html>
