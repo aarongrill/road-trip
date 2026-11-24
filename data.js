@@ -209,7 +209,7 @@ window.TRIP = {
     { id: "highline", cat: "swim", day: 16, name: "Highline Lake State Park beach", lat: 39.27, lng: -108.84, detour: "About 15 minutes from Fruita", note: "A swim beach near the 18 Road trails, a good way to cool off after a desert ride." },
     { id: "fruitapool", cat: "swim", day: 16, name: "Fruita Community Center pool", lat: 39.16, lng: -108.733, detour: "In Fruita", note: "Indoor and outdoor pools with slides. Check day-pass hours." },
     { id: "crater", cat: "swim", day: 17, name: "Homestead Crater, Midway, UT", lat: 40.5239, lng: -111.485, detour: "About 25 minutes from Park City", note: "Swim in a 90–96°F geothermal spring inside a 55-foot limestone dome. Reservations required.", src: "Visit Utah" },
-    { id: "jordanelle", cat: "swim", day: 18, name: "Jordanelle State Park beach", lat: 40.62, lng: -111.42, detour: "At the campground", note: "Swim beach right where we’re camping, for after Deer Valley." },
+    { id: "jordanelleswim", cat: "swim", day: 18, name: "Jordanelle State Park beach", lat: 40.62, lng: -111.42, detour: "At the campground", note: "Swim beach right where we’re camping, for after Deer Valley." },
     { id: "astoria", cat: "swim", day: 19, name: "Astoria Hot Springs, WY", lat: 43.3002, lng: -110.7744, detour: "On US-26/89, about 20 minutes south of Jackson", note: "Six mineral pools, including a children’s pool and a cold plunge, on the Snake River right along our route. Reservations recommended.", src: "Hot Springs Guides" },
     { id: "granitehs", cat: "swim", day: 20, name: "Granite Hot Springs pool, WY", lat: 43.3696, lng: -110.4449, detour: "About 10 miles of gravel road off US-189/191 east of Hoback Junction", note: "A hot spring pool below granite cliffs, a classic outing from Jackson." },
     { id: "fireholeswim", cat: "swim", day: 21, name: "Firehole River swim area, Yellowstone", lat: 44.623, lng: -110.865, detour: "On Firehole Canyon Drive", note: "Yellowstone’s river swim spot, warmed by hot springs upstream. It opens only when water levels are safe, so check before going." },
@@ -219,7 +219,7 @@ window.TRIP = {
     { id: "pettibone", cat: "swim", day: 25, name: "Pettibone Beach, La Crosse", lat: 43.81, lng: -91.26, detour: "A few minutes off I-90", note: "A sandy beach on the Mississippi River, right by the Grandad Bluff lunch stop." },
     { id: "devilsbeach", cat: "swim", day: 26, name: "Devil’s Lake beaches, WI", lat: 43.421, lng: -89.731, detour: "About 20 minutes from the Dells", note: "North and south shore beaches under quartzite bluffs, after breakfast at the lake." },
     { id: "dunes", cat: "swim", day: 27, name: "Indiana Dunes State Park beach", lat: 41.66, lng: -87.06, detour: "About 10 minutes off the Indiana Toll Road", note: "Swim in Lake Michigan below big sand dunes, a break early in the long drive to Raystown." },
-    { id: "sevenpoints", cat: "swim", day: 27, name: "Seven Points Beach, Raystown Lake", lat: 40.38, lng: -78.08, detour: "At the campground", note: "Swim beach on the lake for the end of the long day." },
+    { id: "sevenpointsswim", cat: "swim", day: 27, name: "Seven Points Beach, Raystown Lake", lat: 40.38, lng: -78.08, detour: "At the campground", note: "Swim beach on the lake for the end of the long day." },
     { id: "hersheyboard", cat: "swim", day: 28, name: "The Boardwalk at Hersheypark", lat: 40.288, lng: -76.655, detour: "In Hershey, near Chocolate World", note: "Hersheypark’s water park area, if there’s time for one last splash before home. Needs a park ticket." }
   ],
 

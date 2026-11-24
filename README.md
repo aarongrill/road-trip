@@ -2,6 +2,10 @@
 
 A phone-friendly companion app for our July 2027 mountain bike road trip. Switch between three views with the Map, List, and Ideas buttons under the title. The app opens on the map.
 
+## Filters
+
+The row of buttons under Map, List, and Ideas narrows every view at once: 🍴 Food, 🎡 Attractions, 🚵 Biking, 🏊 Swimming, 🏞️ Views & rest stops, and 🛏️ Sleep. Tap "All" to see everything. "💡 Ideas on/off" shows or hides the stops the family can vote on. In the List, days with nothing in the chosen category are hidden, and the rest open automatically.
+
 ## The three views
 
 **Map**
