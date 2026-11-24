@@ -26,7 +26,7 @@ async function start() {
     const listeners = [];
     onSnapshot(ref, snap => {
       const data = snap.data() || {};
-      listeners.forEach(fn => fn({ votes: data.votes || {}, spots: data.spots || {}, done: data.done || {} }));
+      listeners.forEach(fn => fn({ votes: data.votes || {}, spots: data.spots || {}, done: data.done || {}, alts: data.alts || {} }));
     }, err => console.warn("Sync error", err));
 
     const write = obj => updateDoc(ref, Object.assign({ updated: Date.now() }, obj)).catch(err => console.warn("Sync write failed", err));
@@ -37,7 +37,9 @@ async function start() {
       setVote: (itemId, voterKey, name, on) => write({ [`votes.${itemId}.${voterKey}`]: on ? name : deleteField() }),
       setSpot: spot => write({ [`spots.${spot.id}`]: spot }),
       removeSpot: id => write({ [`spots.${id}`]: deleteField() }),
-      setDone: (id, on) => write({ [`done.${id}`]: on ? true : deleteField() })
+      setDone: (id, on) => write({ [`done.${id}`]: on ? true : deleteField() }),
+      setAlt: alt => write({ [`alts.${alt.id}`]: alt }),
+      removeAlt: id => write({ [`alts.${id}`]: deleteField() })
     });
   } catch (err) {
     console.warn("Sync unavailable, using this phone only", err);

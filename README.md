@@ -14,6 +14,21 @@ Before the trip, Today previews Day 1. Tap any day in the strip at the top to lo
 
 Tap "☰ Filter" at the top left to narrow every view at once: 🍴 Food, 🎡 Attractions, 🚵 Biking, 🏊 Swimming, 🏞️ Views & rest stops, and 🛏️ Sleep. Tap "All" to see everything. "💡 Ideas on/off" shows or hides the stops the family can vote on. In the List, days with nothing in the chosen category are hidden, and the rest open automatically.
 
+## Route options
+
+In the Ideas tab, switch to "🛣️ Route options" to compare other ways to run part of the trip.
+
+- Each option shows which days it replaces, total driving compared with the current plan, the longest driving day (⚠️ at 8 hours or more), when you'd get home, and which overnights it drops. "Day by day" lists each day's drive, stops, and where you'd sleep.
+- Vote on options the same way as stops. "Show on map" draws the option in purple; tap "Close" on the banner to go back.
+- Two options are built in: a Great Lakes finish through Chicago, Detroit, and Niagara Falls that gets home August 1, and a version that still gets home July 31 with three long driving days.
+- **+ Build a route option** opens the route builder: pick which days to replace, then add overnight stops by searching a town (OpenStreetMap search) or picking a place already in the trip. Set nights per stop and reorder with the arrows. The builder calculates each drive (OpenStreetMap routing when there's a signal, otherwise a straight-line estimate) and shows the totals as you go. "Edit a copy" starts from an existing option.
+- Options you build are saved on the phone, and shared with the family when Firebase sharing is set up.
+- The main plan doesn't change until you edit `data.js`. Built-in options live in `alternates` in `data.js`.
+
+## Explore more around a leg
+
+On the Map tab, open a leg and scroll to "🔎 Explore more around this leg." Pick Food, Attractions, Swimming, Views, Biking, or Sleep to search OpenStreetMap near that leg's stops for places that aren't in the plan yet. Results appear as yellow dots, with better-known places (⭐) first. "+ Save for voting" adds one to the plan's stops so the family can vote on it. OpenStreetMap details vary, so check hours before going.
+
 ## Links
 
 Every attraction, restaurant, ride, swim stop, and place to stay has a 🔗 link in every view. If a stop has a `web` address in `data.js`, the link opens that website. Otherwise it opens the stop's Google Maps listing, which shows the website, hours, phone number, and photos. Rides also keep their "Trail info" link. To add a website for any stop, add `web: "https://..."` to it in `data.js`.

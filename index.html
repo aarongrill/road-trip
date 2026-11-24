@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#2F5D3A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Road Trip 2027</title>
-<!-- App version 14 -->
+<!-- App version 15 -->
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -320,6 +320,50 @@
     #pmap { height: calc(100vh - var(--bar-h, 150px) - var(--tab-h) - 90px); }
   }
 
+  /* Routes and explore */
+  .segtabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--line); border-radius: 12px; padding: 3px; margin-bottom: 12px; }
+  .segtabs button { border: 0; background: transparent; color: var(--ink); border-radius: 9px; padding: 9px; font-weight: 700; cursor: pointer; }
+  .segtabs button[aria-pressed="true"] { background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+  .altcard { background: var(--surface); border: 1px solid var(--line); border-left: 5px solid #7B3FA0; border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; }
+  .altcard.main { border-left-color: var(--road); }
+  .altcard h3 { font-family: "Atkinson Hyperlegible", system-ui, sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: 0; margin-bottom: 4px; }
+  .altstats { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font-size: 0.88rem; margin: 6px 0 8px; }
+  .altstats b { color: var(--ink); }
+  .warn { color: #9A4A00; }
+  @media (prefers-color-scheme: dark) { .warn { color: #F3A76A; } }
+  .altday { border-top: 1px solid var(--line); padding: 8px 0; }
+  .altday .t { font-weight: 700; }
+  .altday ul { margin: 4px 0 0; padding-left: 18px; }
+  .altday li { margin: 2px 0; }
+  .altday li a { font-size: 0.85rem; margin-left: 6px; }
+  details.altdays summary { cursor: pointer; color: var(--road); font-weight: 700; margin: 4px 0; }
+  .builder label { display: block; font-weight: 700; margin: 10px 0 4px; }
+  .builder input, .builder select { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; background: var(--bg); color: var(--ink); }
+  .bstop { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+  .bstop .leg { color: var(--muted); font-size: 0.84rem; }
+  .bstop .ctrls { display: flex; gap: 4px; align-items: center; }
+  .bstop .ctrls select { width: auto; padding: 5px; }
+  .bstop .ctrls .btn { padding: 5px 9px; }
+  .searchrow { display: flex; gap: 6px; }
+  .searchrow input { flex: 1; }
+  .results button { display: block; width: 100%; text-align: left; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 7px 10px; margin-top: 5px; cursor: pointer; }
+  .altbanner { position: fixed; z-index: 530; left: 10px; right: 10px; top: calc(var(--bar-h, 70px) + 8px); background: #7B3FA0; color: #fff; border-radius: 12px; padding: 8px 12px;
+    display: flex; gap: 10px; align-items: center; box-shadow: 0 3px 10px rgba(0,0,0,.3); font-size: 0.9rem; }
+  .altbanner span { flex: 1; }
+  .altbanner button { border: 1px solid rgba(255,255,255,.6); background: transparent; color: #fff; border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+  body:not(.mode-map) .altbanner { display: none; }
+  @media (min-width: 900px), (orientation: landscape) and (min-width: 640px) { .altbanner { right: calc(var(--panel-w) + 10px); } }
+  .altpin { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #7B3FA0; color: #fff; font-weight: 700; font-size: 13px; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.4); }
+  .altstop { font-size: 16px; filter: drop-shadow(0 1px 1px rgba(0,0,0,.5)); }
+  .explore { margin-top: 18px; border-top: 2px solid var(--line); padding-top: 12px; }
+  .explore .chips button[aria-pressed="true"] { background: var(--forest); color: #fff; border-color: var(--forest); }
+  .xrow { padding: 9px 0; border-top: 1px solid var(--line); }
+  .xrow:first-child { border-top: 0; }
+  .xrow .n { font-weight: 700; }
+  .xrow .k { color: var(--muted); font-size: 0.84rem; }
+  .xrow .btnrow { margin-top: 5px; }
+  .xpin { width: 14px; height: 14px; border-radius: 50%; background: #E0A800; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.5); }
+
   /* Today view */
   #todayView { display: none; position: fixed; inset: 0; z-index: 450; overflow-y: auto; background: var(--bg);
     padding: calc(var(--bar-h, 70px) + 12px) 0 calc(var(--tab-h) + 24px); -webkit-overflow-scrolling: touch; }
@@ -396,9 +440,9 @@
   <div class="sheet-body" id="sheetBody"></div>
 </section>
 
-<script src="config.js?v=14"></script>
-<script src="data.js?v=14"></script>
-<script src="route-geometry.js?v=14" onerror="window.ROUTE_GEOMETRY = null"></script>
+<script src="config.js?v=15"></script>
+<script src="data.js?v=15"></script>
+<script src="route-geometry.js?v=15" onerror="window.ROUTE_GEOMETRY = null"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function () {
@@ -472,7 +516,7 @@
   });
 
   // ---------- map ----------
-  const map = L.map("map", { zoomControl: false, tap: true });
+  const map = L.map("map", { zoomControl: false, tap: true, zoomSnap: 0.25 });
   L.control.zoom({ position: "topleft" }).addTo(map);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, crossOrigin: true, attribution: "&copy; OpenStreetMap contributors" }).addTo(map);
   const routeLine = L.polyline(T.route, { color: "#1D4E89", weight: 4, opacity: 0.65, dashArray: "6 8" }).addTo(map);
@@ -566,6 +610,7 @@
   const catMatch = id => navCat === "all" || catsOf(id).has(navCat);
   const matches = id => (IDEA[id] && !showIdeas) ? false : catMatch(id);
   function applyFilters() {
+    if (typeof shownAlt !== "undefined" && shownAlt) { Object.values(markers).forEach(m => map.removeLayer(m)); return; }
     const inStage = activeStage === null ? null : stageIds(activeStage);
     Object.entries(markers).forEach(([id, m]) => (matches(id) && (!inStage || inStage.has(id))) ? m.addTo(map) : map.removeLayer(m));
     highlightDay();
@@ -687,6 +732,7 @@
     return pts.length ? L.latLngBounds(pts) : null;
   }
   function showStage(n, fly = true, day) {
+    if (n !== activeStage && typeof exploreLayer !== "undefined") { exploreLayer.clearLayers(); exploreResults = []; exploreFor = null; exploreCat = null; }
     activeStage = n;
     if (day !== undefined) { selectedDay = day; renderDays(); }
     drawStageRoute(); applyFilters(); highlightDay();
@@ -724,7 +770,8 @@
       html += items.length ? `<ul class="stops">${items.map(id => stopItem(id, label(id))).join("")}</ul>`
         : `<p class="fineprint" style="margin:6px 2px">Nothing in this category on this day.</p>`;
     }
-    $("sheetBody").innerHTML = html;
+    $("sheetBody").innerHTML = html + exploreSection();
+    if (exploreFor === activeStage && exploreResults.length) renderExploreList();
   }
 
   // ---------- sheet ----------
@@ -806,7 +853,7 @@
         <h3 class="section-title">My spots (${mine.length})</h3>
         ${mine.length ? `<ul class="stops">${mine.map(s => stopItem(s.id, s.day === null || s.day === undefined ? (MY_CATS[s.cat] || MY_CATS.note).label : `Day ${s.day + 1} · ${(MY_CATS[s.cat] || MY_CATS.note).label}`)).join("")}</ul>`
           : `<p class="fineprint">Nothing added yet. Tap “+ Add a spot” to drop a pin anywhere on the map.</p>`}
-        <p class="fineprint">App version 14 (Today view, offline, bottom tabs)</p>
+        <p class="fineprint">App version 15 (route options, builder, explore)</p>
         <h3 class="section-title">Share my spots</h3>
         <p class="fineprint">Spots are saved on this phone. To share them, export a file and import it on another phone.</p>
         <div class="btnrow">
@@ -1046,7 +1093,12 @@
   }
 
   let ideaSort = store.get("ideaSort", "trip");
+  let ideasTab = store.get("ideasTab", "stops");
+  const segTabs = () => `<div class="segtabs" role="group" aria-label="Ideas sections">
+      <button data-ideastab="stops" aria-pressed="${ideasTab === "stops"}">💡 Stops to vote on</button>
+      <button data-ideastab="routes" aria-pressed="${ideasTab === "routes"}">🛣️ Route options</button></div>`;
   function renderIdeas() {
+    if (ideasTab === "routes") { renderRoutes(); return; }
     let list = IDEAS.filter(x => catMatch(x.id));
     list = list.slice().sort((a, b) => ideaSort === "votes" ? (voteNames(b.id).length - voteNames(a.id).length) || (a.day - b.day) : a.day - b.day);
     const cfg = window.SYNC_CONFIG || {};
@@ -1054,6 +1106,7 @@
       : `<p class="syncnote">Votes are saved on this phone only.${cfg.firebase ? " Couldn’t connect to the shared list; check your connection." : " To share votes with the family, see the README."}</p>`;
     const myIdeas = mine.filter(s => !s.id.startsWith("i_"));
     $("ideasView").innerHTML = `<div class="listwrap">
+      ${segTabs()}
       ${note}
       <div class="whoami"><label for="voterInput"><b>Voting as</b></label>
         <input id="voterInput" maxlength="30" placeholder="Your name" value="${esc(voterName)}">
@@ -1329,6 +1382,335 @@
   }
 
 
+
+  // ---------- route options (alternates) ----------
+  const DATA_ALTS = T.alternates || [];
+  let userAlts = store.get("alts", []);       // routes built in the app
+  let builder = null;                          // draft being edited
+  const legCache = {};
+  const addDays = (iso, n) => { const d = parse(iso); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+  const startOf = from => from === 0 ? P.home : P[T.days[from - 1].stay];
+  const hrs = h => Number(h) || 0;
+  function mainSpan(from, to) {
+    let miles = 0, longest = 0;
+    for (let i = from; i <= to; i++) { const d = T.days[i].drive; if (d) { miles += d.miles; longest = Math.max(longest, hrs(d.hours)); } }
+    return { miles, longest, days: to - from + 1, end: T.days[T.days.length - 1].date };
+  }
+  // A built route turns into days: one driving day per stop, plus extra days for extra nights
+  function draftDays(dr) {
+    const days = []; let date = T.days[dr.from].date, prev = startOf(dr.from);
+    dr.stops.forEach((st, k) => {
+      const leg = dr.legs[k] || {};
+      const isHome = st.home;
+      days.push({ date, title: `To ${st.name}`, drive: { from: prev.name, to: st.name, miles: leg.miles ? Math.round(leg.miles) : "?", hours: leg.hours ? leg.hours.toFixed(1) : "?" , est: leg.est },
+        stay: { name: isHome ? "Home" : st.name, lat: st.lat, lng: st.lng }, stops: [] });
+      date = addDays(date, 1);
+      for (let n = 1; n < (isHome ? 1 : st.nights); n++) { days.push({ date, title: `Day in ${st.name}`, stay: { name: st.name, lat: st.lat, lng: st.lng }, stops: [] }); date = addDays(date, 1); }
+      prev = st;
+    });
+    return days;
+  }
+  function altDays(a) { return a.days || draftDays(a); }
+  function altStats(a) {
+    const days = altDays(a), rep = a.replaces || { from: a.from, to: a.to };
+    let miles = 0, longest = 0, unknown = false;
+    days.forEach(d => { if (d.drive) { if (typeof d.drive.miles === "number") miles += d.drive.miles; else unknown = true; longest = Math.max(longest, hrs(d.drive.hours)); } });
+    const main = mainSpan(rep.from, rep.to);
+    const lastMainIdx = rep.to, tail = T.days.length - 1 - lastMainIdx;        // main days after the replaced span
+    const end = days.length ? addDays(days[days.length - 1].date, tail) : main.end;
+    const shift = Math.round((parse(end) - parse(main.end)) / 86400000);
+    return { days, rep, miles, longest, unknown, main, end, shift };
+  }
+  const fmtShift = n => n === 0 ? "same day" : n > 0 ? `${n} day${n > 1 ? "s" : ""} later` : `${-n} day${n < -1 ? "s" : ""} earlier`;
+  const allAlts = () => [...DATA_ALTS, ...userAlts];
+
+  function altCard(a, isUser) {
+    const st = altStats(a), r = st.rep;
+    const dropped = [];
+    for (let i = r.from; i <= r.to; i++) { const d = T.days[i]; if (d.stay && P[d.stay] && P[d.stay].type !== "home") dropped.push(P[d.stay].name); }
+    const daysHTML = st.days.map(d => `<div class="altday"><div class="t">${longDate(d.date)}: ${esc(d.title)}</div>
+        ${d.drive ? `<div class="${hrs(d.drive.hours) >= 8 ? "warn" : "fineprint"}">🚗 ${esc(d.drive.from)} to ${esc(d.drive.to)}, ${d.drive.miles} mi, about ${d.drive.hours} hrs${d.drive.est ? " (estimate)" : ""}${hrs(d.drive.hours) >= 8 ? " ⚠️ long day" : ""}</div>` : ""}
+        ${d.note ? `<div class="fineprint">${esc(d.note)}</div>` : ""}
+        ${d.stops && d.stops.length ? `<ul>${d.stops.map(x => `<li>${XICON[x.cat] || "📍"} <b>${esc(x.name)}</b>${x.note ? ` · <span class="fineprint">${esc(x.note)}</span>` : ""}
+          <a href="${dirUrl(x)}" target="_blank" rel="noopener">Directions</a> <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.name)}" target="_blank" rel="noopener">🔗 Info</a></li>`).join("")}</ul>` : ""}
+        <div class="fineprint">🛏️ ${esc(d.stay.name)}</div></div>`).join("");
+    return `<article class="altcard">
+      <h3>🛣️ ${esc(a.title)}</h3>
+      ${a.summary ? `<p class="fineprint" style="margin:0">${esc(a.summary)}</p>` : ""}
+      <div class="altstats">
+        <span>Replaces <b>${longDate(T.days[r.from].date)} – ${longDate(T.days[r.to].date)}</b></span>
+        <span>Driving <b>${st.miles.toLocaleString()} mi</b>${st.unknown ? "+" : ""} vs ${st.main.miles.toLocaleString()} mi now</span>
+        <span class="${st.longest >= 8 ? "warn" : ""}">Longest day <b>${st.longest} hrs</b>${st.longest >= 8 ? " ⚠️" : ""}</span>
+        <span class="${st.shift ? "warn" : ""}">Home <b>${longDate(st.end)}</b> (${fmtShift(st.shift)})</span>
+      </div>
+      ${dropped.length ? `<p class="fineprint">Drops these overnights: ${dropped.map(esc).join(", ")}</p>` : ""}
+      <div class="btnrow">
+        ${voteBtn(a.id)}
+        <button class="btn primary" data-showalt="${a.id}">Show on map</button>
+        <button class="btn" data-copyalt="${a.id}">${isUser ? "Edit" : "Edit a copy"}</button>
+        ${isUser ? `<button class="btn danger" data-delalt="${a.id}">Delete</button>` : ""}
+      </div>
+      ${votersLine(a.id)}
+      <details class="altdays"><summary>Day by day</summary>${daysHTML}
+        ${a.border ? `<p class="fineprint" style="margin-top:8px">🛂 ${esc(a.border)}</p>` : ""}</details>
+    </article>`;
+  }
+
+  function renderRoutes() {
+    if (builder) { renderBuilder(); return; }
+    const main = mainSpan(0, T.days.length - 1);
+    $("ideasView").innerHTML = `<div class="listwrap">
+      ${segTabs()}
+      <p class="fineprint">Compare other ways to run part of the trip, vote on them, and build your own. The main plan doesn’t change until you edit <code>data.js</code>.</p>
+      <article class="altcard main"><h3>📋 Current plan</h3>
+        <div class="altstats"><span><b>${T.days.length} days</b></span><span>Driving <b>${main.miles.toLocaleString()} mi</b></span>
+          <span>Longest day <b>${main.longest} hrs</b></span><span>Home <b>${longDate(main.end)}</b></span></div></article>
+      ${allAlts().map(a => altCard(a, userAlts.includes(a))).join("")}
+      <button class="btn primary" data-newalt="1" style="width:100%;justify-content:center;padding:12px">+ Build a route option</button>
+      <p class="fineprint" style="margin-top:10px">Routes you build are saved on this phone${shared ? " and shared with the family" : ""}.</p>
+    </div>`;
+  }
+
+  // ----- builder -----
+  function newDraft(fromAlt) {
+    if (fromAlt) {
+      const r = fromAlt.replaces || { from: fromAlt.from, to: fromAlt.to };
+      const stops = fromAlt.stops ? fromAlt.stops.map(x => Object.assign({}, x)) : [];
+      if (!fromAlt.stops) {
+        let last = null;
+        altDays(fromAlt).forEach(d => {
+          if (last && last.name === d.stay.name) last.nights++;
+          else { last = { name: d.stay.name, lat: d.stay.lat, lng: d.stay.lng, nights: 1, home: d.stay.name === "Home" }; stops.push(last); }
+        });
+      }
+      const isUser = userAlts.includes(fromAlt);
+      return { id: isUser ? fromAlt.id : "alt_" + Date.now(), title: isUser ? fromAlt.title : fromAlt.title + " (my version)", from: r.from, to: r.to, stops, legs: [] };
+    }
+    // default: the last three days, prefilled from the main plan
+    const from = 26, to = T.days.length - 1;
+    return { id: "alt_" + Date.now(), title: "My route option", from, to, stops: stopsFromMain(from, to), legs: [] };
+  }
+  function stopsFromMain(from, to) {
+    const stops = []; let last = null;
+    for (let i = from; i <= to; i++) {
+      const p = P[T.days[i].stay]; if (!p) continue;
+      if (last && last.name === p.name) { last.nights++; continue; }
+      last = { name: p.name, lat: p.lat, lng: p.lng, nights: 1, home: p.type === "home" }; stops.push(last);
+    }
+    return stops;
+  }
+  async function legInfo(a, b) {
+    const key = `${a.lat.toFixed(3)},${a.lng.toFixed(3)}>${b.lat.toFixed(3)},${b.lng.toFixed(3)}`;
+    if (legCache[key]) return legCache[key];
+    try {
+      const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${a.lng},${a.lat};${b.lng},${b.lat}?overview=simplified&geometries=geojson`);
+      const data = await res.json();
+      if (data.code !== "Ok") throw new Error(data.code);
+      const r = data.routes[0];
+      legCache[key] = { miles: r.distance / 1609.34, hours: r.duration / 3600 * 1.08, geom: r.geometry.coordinates.map(([x, y]) => [y, x]) };
+    } catch (e) {
+      const m = miles([a.lat, a.lng], [b.lat, b.lng]) * 1.25;
+      legCache[key] = { miles: m, hours: m / 55, est: true };
+    }
+    return legCache[key];
+  }
+  async function computeLegs(dr) {
+    let prev = startOf(dr.from);
+    for (let k = 0; k < dr.stops.length; k++) {
+      const st = dr.stops[k];
+      dr.legs[k] = await legInfo(prev, st);
+      prev = st;
+      if (builder === dr) renderBuilder();
+    }
+  }
+  function renderBuilder() {
+    const dr = builder;
+    const opts = (sel) => T.days.map((d, i) => `<option value="${i}" ${i === sel ? "selected" : ""}>Day ${i + 1}: ${longDate(d.date)}</option>`).join("");
+    const start = startOf(dr.from);
+    const st = dr.stops.length ? altStats(dr) : null;
+    const known = [
+      ...Object.entries(P).filter(([, p]) => ["camp", "hotel", "host", "home"].includes(p.type)).map(([id, p]) => [p.name, p.lat, p.lng, p.type === "home"]),
+      ...DATA_ALTS.flatMap(a => a.days.map(d => [d.stay.name, d.stay.lat, d.stay.lng, d.stay.name === "Home"]))
+    ].filter((x, k, arr) => arr.findIndex(y => y[0] === x[0]) === k);
+    $("ideasView").innerHTML = `<div class="listwrap builder">
+      ${segTabs()}
+      <div class="altcard">
+        <h3>🛠️ Build a route option</h3>
+        <label for="bTitle">Name</label><input id="bTitle" maxlength="80" value="${esc(dr.title)}">
+        <label>Replace these days of the plan</label>
+        <div class="searchrow"><select id="bFrom" aria-label="First day to replace">${opts(dr.from)}</select><select id="bTo" aria-label="Last day to replace">${opts(dr.to)}</select></div>
+        <button class="btn" data-bprefill="1" style="margin-top:6px">Start from the current plan for these days</button>
+
+        <label>Overnight stops, in order</label>
+        <p class="fineprint" style="margin:0 0 4px">Starting from ${esc(start.name)} the night before.</p>
+        ${dr.stops.map((s2, k) => {
+          const lg = dr.legs[k];
+          return `<div class="bstop"><div><b>${k + 1}. ${esc(s2.name)}</b>
+              <div class="leg ${lg && lg.hours >= 8 ? "warn" : ""}">${lg ? `🚗 ${Math.round(lg.miles)} mi, about ${lg.hours.toFixed(1)} hrs${lg.est ? " (straight-line estimate)" : ""}${lg.hours >= 8 ? " ⚠️ long" : ""}` : "Calculating drive…"}</div></div>
+            <div class="ctrls">
+              ${s2.home ? `<span class="fineprint">end</span>` : `<select data-bnights="${k}" aria-label="Nights at ${esc(s2.name)}">${[1, 2, 3, 4].map(n => `<option ${n === s2.nights ? "selected" : ""} value="${n}">${n} night${n > 1 ? "s" : ""}</option>`).join("")}</select>`}
+              <button class="btn" data-bmove="${k},-1" aria-label="Move up" ${k === 0 ? "disabled" : ""}>↑</button>
+              <button class="btn" data-bmove="${k},1" aria-label="Move down" ${k === dr.stops.length - 1 ? "disabled" : ""}>↓</button>
+              <button class="btn danger" data-bdel="${k}" aria-label="Remove ${esc(s2.name)}">✕</button>
+            </div></div>`; }).join("") || `<p class="fineprint">No stops yet. Add one below.</p>`}
+
+        <label for="bSearch">Add a stop: search a town or place</label>
+        <div class="searchrow"><input id="bSearch" placeholder="For example, Niagara Falls, NY" autocomplete="off"><button class="btn" data-bsearch="1">Search</button></div>
+        <div class="results" id="bResults"></div>
+        <label for="bKnown">Or pick a place already in the trip</label>
+        <select id="bKnown"><option value="">Choose…</option>${known.map((k, n) => `<option value="${n}">${esc(k[0])}</option>`).join("")}</select>
+
+        ${st ? `<div class="altstats" style="margin-top:12px">
+          <span>Uses <b>${st.days.length} days</b> (replaces ${dr.to - dr.from + 1})</span>
+          <span>Driving <b>${st.miles.toLocaleString()} mi</b> vs ${st.main.miles.toLocaleString()} mi now</span>
+          <span class="${st.longest >= 8 ? "warn" : ""}">Longest day <b>${st.longest.toFixed ? st.longest.toFixed(1) : st.longest} hrs</b></span>
+          <span class="${st.shift ? "warn" : ""}">Home <b>${longDate(st.end)}</b> (${fmtShift(st.shift)})</span></div>` : ""}
+        ${dr.to === T.days.length - 1 && dr.stops.length && !dr.stops[dr.stops.length - 1].home ? `<p class="warn">This replaces the last day, so finish with Home. <button class="btn" data-bhome="1">Add Home</button></p>` : ""}
+        <div class="btnrow" style="margin-top:10px">
+          <button class="btn" data-bcancel="1">Cancel</button>
+          <button class="btn" data-bpreview="1" ${dr.stops.length ? "" : "disabled"}>Preview on map</button>
+          <button class="btn primary" data-bsave="1" ${dr.stops.length ? "" : "disabled"}>Save option</button>
+        </div>
+        <p class="fineprint" style="margin-top:8px">Drive times come from OpenStreetMap routing when there’s a signal; otherwise they’re straight-line estimates. Search results come from OpenStreetMap.</p>
+      </div></div>`;
+  }
+  function builderChanged(recompute = true) { builder.legs = recompute ? [] : builder.legs; renderBuilder(); if (recompute) computeLegs(builder); }
+  async function builderSearch() {
+    const q = $("bSearch").value.trim(); if (!q) return;
+    $("bResults").innerHTML = `<p class="fineprint">Searching…</p>`;
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&countrycodes=us,ca&q=${encodeURIComponent(q)}`, { headers: { "Accept-Language": "en" } });
+      const list = await res.json();
+      builderResults = list.map(r => ({ name: r.display_name.split(",").slice(0, 2).join(",").trim(), full: r.display_name, lat: +r.lat, lng: +r.lon }));
+      $("bResults").innerHTML = builderResults.length ? builderResults.map((r, k) => `<button data-badd="${k}">${esc(r.full)}</button>`).join("") : `<p class="fineprint">No matches. Try adding the state.</p>`;
+    } catch (e) { $("bResults").innerHTML = `<p class="fineprint">Search needs a connection. You can still pick a place already in the trip.</p>`; }
+  }
+  let builderResults = [];
+  function saveBuilder() {
+    const dr = builder;
+    const rec = { id: dr.id, title: $("bTitle").value.trim() || "My route option", from: dr.from, to: dr.to, replaces: { from: dr.from, to: dr.to },
+      stops: dr.stops.map(x => ({ name: x.name, lat: x.lat, lng: x.lng, nights: x.nights, home: !!x.home })),
+      legs: dr.legs.map(l => l ? { miles: l.miles, hours: l.hours, est: !!l.est } : null), summary: "Built in the app." };
+    userAlts = userAlts.filter(a => a.id !== rec.id).concat(rec);
+    store.set("alts", userAlts);
+    if (shared && window.TripSync.setAlt) window.TripSync.setAlt(rec);
+    builder = null; renderRoutes();
+  }
+
+  // ----- show a route option on the map -----
+  const altLayer = L.layerGroup().addTo(map);
+  let shownAlt = null;
+  async function showAlt(a) {
+    shownAlt = a;
+    setMode("map");
+    await new Promise(r => setTimeout(r, 60));
+    map.invalidateSize();
+    altLayer.clearLayers();
+    applyFilters(); routeLine.setStyle({ color: "#8A9A8E", weight: 3, opacity: 0.5 }); stageLayer.clearLayers();
+    const st = altStats(a), days = st.days;
+    // start from the night before
+    let prev = startOf(st.rep.from); const pts = [[prev.lat, prev.lng]];
+    let n = 0;
+    for (const d of days) {
+      if (d.drive) {
+        const leg = await legInfo(prev, d.stay);
+        L.polyline(leg.geom || [[prev.lat, prev.lng], [d.stay.lat, d.stay.lng]], { color: "#7B3FA0", weight: 5, opacity: 0.85, dashArray: leg.geom ? null : "8 8" }).addTo(altLayer);
+        n++;
+        L.marker([d.stay.lat, d.stay.lng], { icon: L.divIcon({ className: "", html: `<div class="altpin">${n}</div>`, iconSize: [26, 26], iconAnchor: [13, 13] }) })
+          .bindTooltip(`${esc(d.stay.name)} · ${longDate(d.date)}`).addTo(altLayer);
+        prev = d.stay;
+      }
+      (d.stops || []).forEach(x => {
+        const ic = XICON[x.cat] || "📍";
+        L.marker([x.lat, x.lng], { icon: L.divIcon({ className: "", html: `<div class="altstop">${ic}</div>`, iconSize: [20, 20], iconAnchor: [10, 10] }) })
+          .bindTooltip(esc(x.name)).addTo(altLayer);
+        pts.push([x.lat, x.lng]);
+      });
+      pts.push([d.stay.lat, d.stay.lng]);
+    }
+    let banner = document.getElementById("altBanner");
+    if (!banner) { banner = document.createElement("div"); banner.id = "altBanner"; banner.className = "altbanner"; document.body.appendChild(banner); }
+    banner.innerHTML = `<span>🛣️ Showing route option: <b>${esc(a.title)}</b></span><button data-hidealt="1">Close</button>`;
+    banner.hidden = false;
+    map.fitBounds(L.latLngBounds(pts), fitPad());
+  }
+  function hideAlt() { shownAlt = null; altLayer.clearLayers(); const b = document.getElementById("altBanner"); if (b) b.hidden = true; applyFilters(); drawStageRoute(); }
+
+  // ---------- explore more around a leg (OpenStreetMap) ----------
+  const exploreLayer = L.layerGroup().addTo(map);
+  let exploreCat = null, exploreResults = [], exploreFor = null;
+  const OQ = {
+    see: ['nwr["tourism"~"^(attraction|museum|theme_park|zoo|aquarium|gallery)$"]["name"]', 'nwr["historic"~"^(monument|castle|fort|ship|locomotive|aircraft)$"]["name"]'],
+    eat: ['nwr["amenity"~"^(restaurant|cafe|ice_cream)$"]["name"]["cuisine"]'],
+    swim: ['nwr["leisure"~"^(water_park|swimming_area|beach_resort)$"]["name"]', 'nwr["natural"~"^(beach|hot_spring)$"]["name"]'],
+    view: ['nwr["tourism"="viewpoint"]["name"]', 'nwr["natural"="waterfall"]["name"]'],
+    ride: ['nwr["sport"~"mtb|bmx"]["name"]', 'relation["route"="mtb"]["name"]'],
+    sleep: ['nwr["tourism"~"^(camp_site|hotel|motel)$"]["name"]']
+  };
+  const XR = { eat: 3000, see: 20000, swim: 20000, view: 20000, ride: 30000, sleep: 15000 };
+  const XICON = { eat: "🍴", see: "🎡", swim: "🏊", view: "🏞️", ride: "🚵", sleep: "🛏️" };
+  const XLABEL = { eat: "Food", see: "Attractions", swim: "Swimming", view: "Views", ride: "Biking", sleep: "Sleep" };
+  function legPoints(n) {
+    const stg = STAGES[n], pts = [];
+    for (let i = stg.from; i <= stg.to; i++) {
+      const d = T.days[i];
+      [d.stay, ...(d.ride ? d.ride.places : []), ...(d.meals || []).map(m => m[1]), ...(d.fun || [])].forEach(id => {
+        const p = P[id]; if (p && p.type !== "airport" && !pts.some(q => miles([q.lat, q.lng], [p.lat, p.lng]) < 5)) pts.push({ lat: p.lat, lng: p.lng, name: p.name, day: i });
+      });
+    }
+    return pts.slice(0, 8);
+  }
+  async function runExplore(cat) {
+    exploreCat = cat; exploreFor = activeStage;
+    const box = document.getElementById("exploreBox"); if (!box) return;
+    box.innerHTML = `<p class="fineprint">Searching OpenStreetMap near this leg…</p>`;
+    const pts = legPoints(activeStage), R = XR[cat];
+    const q = `[out:json][timeout:25];(${pts.map(p => OQ[cat].map(f => `${f}(around:${R},${p.lat},${p.lng});`).join("")).join("")});out center tags 200;`;
+    try {
+      const res = await fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: "data=" + encodeURIComponent(q), headers: { "Content-Type": "application/x-www-form-urlencoded" } });
+      if (!res.ok) throw new Error(res.status);
+      const data = await res.json();
+      const planned = new Set([...Object.values(P), ...IDEAS, ...mine].map(p => p.name.toLowerCase()));
+      const seen = new Set();
+      exploreResults = data.elements.map(el => {
+        const lat = el.lat || (el.center && el.center.lat), lng = el.lon || (el.center && el.center.lon), t = el.tags || {};
+        if (!lat || !t.name) return null;
+        const key = t.name.toLowerCase(); if (seen.has(key) || planned.has(key)) return null; seen.add(key);
+        let near = pts[0], best = Infinity; pts.forEach(p => { const m = miles([p.lat, p.lng], [lat, lng]); if (m < best) { best = m; near = p; } });
+        const kind = (t.tourism || t.amenity || t.leisure || t.natural || t.historic || t.sport || t.route || "").replace(/_/g, " ");
+        const notable = !!(t.wikipedia || t.wikidata);
+        return { name: t.name, lat, lng, kind, cuisine: t.cuisine ? t.cuisine.replace(/_/g, " ").replace(/;/g, ", ") : "", web: t.website || t["contact:website"] || "",
+          city: t["addr:city"] || "", dist: best, near, notable };
+      }).filter(Boolean).sort((a, b) => (b.notable - a.notable) || (a.dist - b.dist)).slice(0, 25);
+      drawExplore(); renderExploreList();
+    } catch (e) {
+      box.innerHTML = `<p class="fineprint">Explore needs a connection, and the OpenStreetMap search service can be busy. Try again in a minute.</p>`;
+    }
+  }
+  function drawExplore() {
+    exploreLayer.clearLayers();
+    exploreResults.forEach((r, k) => L.marker([r.lat, r.lng], { icon: L.divIcon({ className: "", html: `<div class="xpin"></div>`, iconSize: [14, 14], iconAnchor: [7, 7] }), title: r.name })
+      .bindTooltip(esc(r.name)).on("click", () => { const el = document.getElementById("x" + k); if (el) el.scrollIntoView({ block: "center" }); }).addTo(exploreLayer));
+  }
+  function renderExploreList() {
+    const box = document.getElementById("exploreBox"); if (!box) return;
+    if (!exploreResults.length) { box.innerHTML = `<p class="fineprint">Nothing new turned up for ${XLABEL[exploreCat].toLowerCase()} near this leg.</p>`; return; }
+    box.innerHTML = `<p class="fineprint">${exploreResults.length} places from OpenStreetMap, best known first (yellow dots on the map). Details vary, so check before you go.</p>` +
+      exploreResults.map((r, k) => `<div class="xrow" id="x${k}"><div class="n">${XICON[exploreCat]} ${esc(r.name)}${r.notable ? " ⭐" : ""}</div>
+        <div class="k">${esc(r.kind)}${r.cuisine ? " · " + esc(r.cuisine) : ""} · ${r.dist < 10 ? r.dist.toFixed(1) : Math.round(r.dist)} mi from ${esc(r.near.name)}</div>
+        <div class="btnrow">
+          <button class="btn" data-xshow="${k}">Show</button>
+          <a class="btn" href="${r.web || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(r.name + (r.city ? ", " + r.city : ""))}" target="_blank" rel="noopener">🔗 ${r.web ? "Website" : "Info"}</a>
+          <button class="btn" data-xsave="${k}">+ Save for voting</button>
+        </div></div>`).join("");
+  }
+  function exploreSection() {
+    return `<div class="explore"><h3 class="section-title">🔎 Explore more around this leg</h3>
+      <p class="fineprint" style="margin:0 0 6px">Searches OpenStreetMap near this leg’s stops for places that aren’t in the plan yet.</p>
+      <div class="chips">${Object.keys(XLABEL).map(k => `<button class="btn" data-xcat="${k}" aria-pressed="${exploreCat === k && exploreFor === activeStage}">${XICON[k]} ${XLABEL[k]}</button>`).join("")}</div>
+      <div id="exploreBox">${exploreFor === activeStage && exploreResults.length ? "" : `<p class="fineprint">Pick a category to search.</p>`}</div></div>`;
+  }
+
   // ---------- Today view ----------
   let todayPick = null, nearCat = null, lastPos = null, nearNote = "";
   const miles = (a, b) => {
@@ -1494,6 +1876,35 @@
   document.addEventListener("click", e => {
     const t = e.target;
     const mb = t.closest("[data-mode]"); if (mb) { setMode(mb.dataset.mode); return; }
+    const it = t.closest("[data-ideastab]"); if (it) { ideasTab = it.dataset.ideastab; store.set("ideasTab", ideasTab); renderIdeas(); $("ideasView").scrollTo({ top: 0 }); return; }
+    const sa = t.closest("[data-showalt]"); if (sa) { const a = allAlts().find(x => x.id === sa.dataset.showalt); if (a) showAlt(a); return; }
+    if (t.closest("[data-hidealt]")) { hideAlt(); return; }
+    if (t.closest("[data-newalt]")) { builder = newDraft(); renderBuilder(); computeLegs(builder); $("ideasView").scrollTo({ top: 0 }); return; }
+    const ca = t.closest("[data-copyalt]"); if (ca) { builder = newDraft(allAlts().find(x => x.id === ca.dataset.copyalt)); renderBuilder(); computeLegs(builder); $("ideasView").scrollTo({ top: 0 }); return; }
+    const da = t.closest("[data-delalt]");
+    if (da) { const a = userAlts.find(x => x.id === da.dataset.delalt); if (a && confirm(`Delete “${a.title}”?`)) { userAlts = userAlts.filter(x => x !== a); store.set("alts", userAlts); if (shared && window.TripSync.removeAlt) window.TripSync.removeAlt(a.id); renderRoutes(); } return; }
+    if (builder) {
+      if (t.closest("[data-bcancel]")) { builder = null; renderRoutes(); return; }
+      if (t.closest("[data-bsave]")) { builder.title = $("bTitle").value; saveBuilder(); return; }
+      if (t.closest("[data-bpreview]")) { builder.title = $("bTitle").value; showAlt(Object.assign({}, builder, { replaces: { from: builder.from, to: builder.to } })); return; }
+      if (t.closest("[data-bsearch]")) { builderSearch(); return; }
+      if (t.closest("[data-bprefill]")) { builder.title = $("bTitle").value; builder.stops = stopsFromMain(builder.from, builder.to); builderChanged(); return; }
+      if (t.closest("[data-bhome]")) { builder.title = $("bTitle").value; builder.stops.push({ name: "Home", lat: P.home.lat, lng: P.home.lng, nights: 1, home: true }); builderChanged(); return; }
+      const ba = t.closest("[data-badd]"); if (ba) { builder.title = $("bTitle").value; const r = builderResults[Number(ba.dataset.badd)]; builder.stops.push({ name: r.name, lat: r.lat, lng: r.lng, nights: 1 }); builderResults = []; builderChanged(); return; }
+      const bm = t.closest("[data-bmove]"); if (bm) { builder.title = $("bTitle").value; const [k, dir] = bm.dataset.bmove.split(",").map(Number); const a = builder.stops; [a[k], a[k + dir]] = [a[k + dir], a[k]]; builderChanged(); return; }
+      const bd = t.closest("[data-bdel]"); if (bd) { builder.title = $("bTitle").value; builder.stops.splice(Number(bd.dataset.bdel), 1); builderChanged(); return; }
+    }
+    const xc = t.closest("[data-xcat]"); if (xc) { document.querySelectorAll("[data-xcat]").forEach(b => b.setAttribute("aria-pressed", String(b === xc))); runExplore(xc.dataset.xcat); return; }
+    const xs = t.closest("[data-xshow]"); if (xs) { const r = exploreResults[Number(xs.dataset.xshow)]; map.setView([r.lat, r.lng], Math.max(map.getZoom(), 13)); focusOn(r.lat, r.lng); return; }
+    const xv = t.closest("[data-xsave]");
+    if (xv) {
+      const r = exploreResults[Number(xv.dataset.xsave)];
+      const cat = { eat: "meal", see: "fun", swim: "swim", view: "view", ride: "ride", sleep: "stay" }[exploreCat];
+      const rec = { id: "u" + Date.now(), name: r.name, cat, day: r.near.day, note: `Found with Explore${r.kind ? " (" + r.kind + ")" : ""}.`, lat: r.lat, lng: r.lng };
+      mine.push(rec); saveMine(); syncSpot(rec);
+      xv.textContent = "Saved ✓"; xv.disabled = true;
+      return;
+    }
     const nb = t.closest("[data-near]"); if (nb) { pickNear(nb.dataset.near); return; }
     const tp = t.closest("[data-todaypick]"); if (tp) { todayPick = Number(tp.dataset.todaypick); selectedDay = todayPick; renderDays(); renderToday(); $("todayView").scrollTo({ top: 0 }); return; }
     const sg = t.closest("[data-stage]");
@@ -1553,9 +1964,25 @@
   }, true);
   window.addEventListener("resize", () => { if (pmap && mode === "list") pmap.invalidateSize(); });
 
+  document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "bSearch") { e.preventDefault(); builderSearch(); } });
   document.addEventListener("change", e => {
     if (e.target.id === "importFile" && e.target.files[0]) importMine(e.target.files[0]);
     if (e.target.id === "ideaSort") { ideaSort = e.target.value; store.set("ideaSort", ideaSort); renderIdeas(); }
+    if (builder && (e.target.id === "bFrom" || e.target.id === "bTo")) {
+      builder.title = $("bTitle").value;
+      builder.from = Number($("bFrom").value); builder.to = Math.max(builder.from, Number($("bTo").value));
+      builderChanged();
+    }
+    if (builder && e.target.dataset.bnights !== undefined) { builder.title = $("bTitle").value; builder.stops[Number(e.target.dataset.bnights)].nights = Number(e.target.value); builderChanged(false); }
+    if (builder && e.target.id === "bKnown" && e.target.value !== "") {
+      builder.title = $("bTitle").value;
+      const known = [
+        ...Object.entries(P).filter(([, p]) => ["camp", "hotel", "host", "home"].includes(p.type)).map(([id, p]) => [p.name, p.lat, p.lng, p.type === "home"]),
+        ...DATA_ALTS.flatMap(a => a.days.map(d => [d.stay.name, d.stay.lat, d.stay.lng, d.stay.name === "Home"]))
+      ].filter((x, k, arr) => arr.findIndex(y => y[0] === x[0]) === k);
+      const k = known[Number(e.target.value)];
+      builder.stops.push({ name: k[0], lat: k[1], lng: k[2], nights: 1, home: k[3] }); builderChanged();
+    }
   });
 
   // ---------- shared sync (optional) ----------
@@ -1578,6 +2005,11 @@
         mine = Object.values(state.spots);
       }
       votes = state.votes; done = Object.assign({}, state.done);
+      if (state.alts) {
+        if (state.firstMerge) userAlts.forEach(a => { if (!state.alts[a.id] && S.setAlt) S.setAlt(a); });
+        userAlts = state.firstMerge ? Object.values(Object.assign({}, ...userAlts.map(a => ({ [a.id]: a })), state.alts)) : Object.values(state.alts);
+        store.set("alts", userAlts);
+      }
       store.set("mine", mine); store.set("votes", votes); store.set("done", done);
       refreshAll();
     });
@@ -1600,6 +2032,6 @@
   if (mode === "list" && startDay !== null) scrollToDay(startDay);
 })();
 </script>
-<script type="module" src="sync.js?v=14"></script>
+<script type="module" src="sync.js?v=15"></script>
 </body>
 </html>

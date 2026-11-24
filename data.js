@@ -240,6 +240,80 @@ window.TRIP = {
     { title: "Raystown Lake and home", from: 27, to: 28 }
   ],
 
+
+  // Alternate routes the family can compare and vote on. "replaces" is the range of main-plan days (0 = July 3)
+  // that the option swaps out. Miles and hours are estimates; the app recalculates user-built routes live.
+  alternates: [
+    {
+      id: "alt_greatlakes_aug1",
+      title: "Great Lakes finish: Chicago, Detroit, Niagara (home Aug 1)",
+      summary: "Swaps Starved Rock, Raystown, and Hershey for Chicago, Detroit, and Niagara Falls. Adds one day, so we get home Sunday, August 1.",
+      replaces: { from: 26, to: 28 },
+      days: [
+        { date: "2027-07-29", title: "Noah’s Ark, then Chicago", drive: { from: "Wisconsin Dells", to: "Chicago", miles: 195, hours: "3" },
+          stay: { name: "Hotel in downtown Chicago", lat: 41.8919, lng: -87.629 },
+          stops: [
+            { name: "Cloud Gate (“The Bean”), Millennium Park", lat: 41.8827, lng: -87.6233, cat: "see", note: "The giant mirrored sculpture downtown; free." },
+            { name: "North Avenue Beach", lat: 41.9134, lng: -87.6249, cat: "swim", note: "Lake Michigan beach with skyline views, a short walk or bike from downtown." },
+            { name: "Portillo’s, Chicago", lat: 41.8936, lng: -87.6315, cat: "eat", note: "Chicago Italian beef and hot dogs." }
+          ] },
+        { date: "2027-07-30", title: "Chicago to Detroit", drive: { from: "Chicago", to: "Detroit", miles: 285, hours: "4.5" },
+          stay: { name: "Hotel in downtown Detroit", lat: 42.3314, lng: -83.0458 },
+          stops: [
+            { name: "Potawatomi Trail, Pinckney Recreation Area", lat: 42.43, lng: -83.97, cat: "ride", note: "Classic Michigan singletrack about 20 minutes off I-94 near Ann Arbor. Check trail status after rain." },
+            { name: "American and Lafayette Coney Island", lat: 42.3317, lng: -83.0478, cat: "eat", note: "Two rival Coney dog diners side by side downtown since the early 1900s. Pick a side, or try both.", src: "Visit Detroit" },
+            { name: "Belle Isle", lat: 42.342, lng: -82.99, cat: "swim", note: "Island park in the Detroit River with a beach and a famously fast giant slide." }
+          ] },
+        { date: "2027-07-31", title: "Detroit to Niagara Falls", drive: { from: "Detroit", to: "Niagara Falls, NY", miles: 370, hours: "6" },
+          note: "This drive goes around Lake Erie through Ohio. Cutting through Ontario saves about 115 miles and 1.5 hours, but everyone needs border documents (see the note below).",
+          stay: { name: "Hotel in Niagara Falls, NY", lat: 43.0896, lng: -79.064 },
+          stops: [
+            { name: "A Christmas Story House, Cleveland", lat: 41.4686, lng: -81.6873, cat: "see", note: "The actual house from the movie, leg lamp included." },
+            { name: "Presque Isle State Park beaches, Erie, PA", lat: 42.155, lng: -80.1, cat: "swim", note: "Sandy Lake Erie beaches just off I-90." },
+            { name: "Cave of the Winds, Niagara Falls State Park", lat: 43.082, lng: -79.071, cat: "view", note: "Walkways at the base of Bridal Veil Falls. You will get soaked." }
+          ] },
+        { date: "2027-08-01", title: "Niagara to home", drive: { from: "Niagara Falls, NY", to: "Home", miles: 390, hours: "6.5" },
+          stay: { name: "Home", lat: 40.735, lng: -74.17 },
+          stops: [
+            { name: "Anchor Bar, Buffalo", lat: 42.9006, lng: -78.8727, cat: "eat", note: "Known as the birthplace of Buffalo wings." },
+            { name: "Corning Museum of Glass", lat: 42.1497, lng: -77.0545, cat: "see", note: "Glassblowing shows, right off I-86." },
+            { name: "Watkins Glen State Park gorge", lat: 42.3758, lng: -76.871, cat: "view", note: "A trail through a gorge with 19 waterfalls, about 30 minutes off the route." }
+          ] }
+      ],
+      border: "If you cut through Ontario: adults need a passport, passport card, NEXUS card, or enhanced driver’s license; children under 16 can show a birth certificate. Bring the car’s registration and insurance card."
+    },
+    {
+      id: "alt_greatlakes_jul31",
+      title: "Great Lakes, still home July 31",
+      summary: "Keeps the July 31 return by skipping the Noah’s Ark morning and the Chicago overnight. Chicago becomes a lunch stop. Three big driving days in a row.",
+      replaces: { from: 26, to: 28 },
+      days: [
+        { date: "2027-07-29", title: "Dells to Detroit, via Chicago", drive: { from: "Wisconsin Dells", to: "Detroit", miles: 480, hours: "7.5" },
+          note: "Leave the Dells early. This is a long day.",
+          stay: { name: "Hotel in downtown Detroit", lat: 42.3314, lng: -83.0458 },
+          stops: [
+            { name: "Cloud Gate (“The Bean”), Millennium Park", lat: 41.8827, lng: -87.6233, cat: "see", note: "Lunch break downtown." },
+            { name: "Portillo’s, Chicago", lat: 41.8936, lng: -87.6315, cat: "eat", note: "Chicago Italian beef and hot dogs." },
+            { name: "American and Lafayette Coney Island", lat: 42.3317, lng: -83.0478, cat: "eat", note: "Rival Coney dog diners side by side; open late.", src: "Visit Detroit" }
+          ] },
+        { date: "2027-07-30", title: "Detroit to Niagara Falls", drive: { from: "Detroit", to: "Niagara Falls, NY", miles: 370, hours: "6" },
+          stay: { name: "Hotel in Niagara Falls, NY", lat: 43.0896, lng: -79.064 },
+          stops: [
+            { name: "Belle Isle", lat: 42.342, lng: -82.99, cat: "swim", note: "Morning swim or giant slide before leaving Detroit." },
+            { name: "A Christmas Story House, Cleveland", lat: 41.4686, lng: -81.6873, cat: "see", note: "The house from the movie." },
+            { name: "Cave of the Winds, Niagara Falls State Park", lat: 43.082, lng: -79.071, cat: "view", note: "Evening at the falls." }
+          ] },
+        { date: "2027-07-31", title: "Niagara to home", drive: { from: "Niagara Falls, NY", to: "Home", miles: 390, hours: "6.5" },
+          stay: { name: "Home", lat: 40.735, lng: -74.17 },
+          stops: [
+            { name: "Anchor Bar, Buffalo", lat: 42.9006, lng: -78.8727, cat: "eat", note: "Birthplace of Buffalo wings." },
+            { name: "Corning Museum of Glass", lat: 42.1497, lng: -77.0545, cat: "see", note: "Right off I-86." }
+          ] }
+      ],
+      border: "Cutting through Ontario on July 30 saves about 1.5 hours. Adults need a passport, passport card, NEXUS card, or enhanced driver’s license; children under 16 can show a birth certificate."
+    }
+  ],
+
   checklist: [
     "Book Sylvan Lake in Custer State Park (reservations open a year ahead)",
     "Confirm dates with Rebekah, Aaron’s parents, Bryant, and Wes",
