@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#2F5D3A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Road Trip 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root {
+    --bg: #EEF2EA; --surface: #F9FBF6; --ink: #17251C; --muted: #56655A; --line: #D3DCCF;
+    --forest: #2F5D3A; --blaze: #D9621A; --road: #1D4E89; --shield-red: #B3282D;
+    --fun: #7A4FA3; --meal: #A07614; --mine: #C2185B; --focus: #1D4E89;
+    --sheet-peek: 150px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0E1712; --surface: #16231B; --ink: #E5ECE3; --muted: #9DAE9F; --line: #2A3A30;
+      --forest: #7CC08B; --blaze: #F08A45; --road: #7FA9E0; --fun: #B996DA; --meal: #D9B04F;
+      --mine: #F48FB1; --focus: #9CC2F0; color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; overflow: hidden; }
+  body { background: var(--bg); color: var(--ink); font: 16px/1.45 "Atkinson Hyperlegible", system-ui, sans-serif; }
+  h1, h2, h3 { font-family: "Barlow Condensed", "Arial Narrow", sans-serif; letter-spacing: 0.01em; margin: 0; }
+  a { color: var(--road); }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  button, .btn, select, input, textarea { font: inherit; }
+
+  #map { position: fixed; inset: 0; z-index: 1; background: var(--bg); }
+
+  /* Top bar with day strip */
+  .bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+    background: var(--forest); color: #fff;
+    padding-top: env(safe-area-inset-top, 0px);
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  }
+  @media (prefers-color-scheme: dark) { .bar { background: #1E3A27; } }
+  .bar .row { display: flex; align-items: baseline; justify-content: space-between; padding: 8px 14px 4px; }
+  .bar h1 { font-size: 1.3rem; }
+  .bar .status { font-size: 0.9rem; opacity: 0.9; }
+  .days { display: flex; gap: 6px; overflow-x: auto; padding: 6px 10px 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .days::-webkit-scrollbar { display: none; }
+  .days button {
+    flex: none; border: 1px solid rgba(255,255,255,.35); background: transparent; color: #fff;
+    border-radius: 10px; padding: 4px 9px; line-height: 1.15; text-align: center; cursor: pointer;
+  }
+  .days button b { display: block; font-family: "Barlow Condensed", sans-serif; font-size: 1.15rem; }
+  .days button small { font-size: 0.72rem; opacity: 0.85; }
+  .days button[aria-pressed="true"] { background: #fff; color: var(--road); border-color: #fff; }
+  .days button.today { box-shadow: inset 0 -3px 0 var(--blaze); }
+
+  /* Floating buttons */
+  .fab, .locate {
+    position: fixed; z-index: 550; right: 14px; border: 0; cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,.3);
+  }
+  .fab {
+    bottom: calc(var(--sheet-peek) + 16px + env(safe-area-inset-bottom, 0px));
+    background: var(--mine); color: #fff; border-radius: 999px; padding: 12px 18px; font-weight: 700;
+  }
+  .locate {
+    bottom: calc(var(--sheet-peek) + 76px + env(safe-area-inset-bottom, 0px));
+    width: 48px; height: 48px; border-radius: 50%; background: var(--surface); color: var(--ink); font-size: 1.4rem;
+  }
+  body.sheet-open .fab, body.sheet-open .locate, body.adding .fab, body.adding .locate { display: none; }
+
+  /* Add mode */
+  .crosshair { position: fixed; z-index: 520; left: 50%; top: 50%; transform: translate(-50%, -100%); pointer-events: none; font-size: 40px; filter: drop-shadow(0 2px 2px rgba(0,0,0,.4)); }
+  .placebar {
+    position: fixed; z-index: 560; left: 12px; right: 12px; bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    background: var(--surface); border-radius: 14px; padding: 12px 14px; box-shadow: 0 4px 16px rgba(0,0,0,.3);
+  }
+  .placebar p { margin: 0 0 10px; }
+  [hidden] { display: none !important; }
+
+  /* Bottom sheet */
+  .sheet {
+    position: fixed; z-index: 540; left: 0; right: 0; bottom: 0;
+    max-width: 720px; margin: 0 auto;
+    background: var(--surface); color: var(--ink);
+    border-radius: 16px 16px 0 0; box-shadow: 0 -4px 18px rgba(0,0,0,.25);
+    height: var(--sheet-peek); transition: height .2s ease;
+    display: flex; flex-direction: column;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  body.sheet-open .sheet { height: 68vh; }
+  body.adding .sheet { display: none; }
+  .handle { border: 0; background: transparent; padding: 8px 0 4px; cursor: pointer; width: 100%; flex: none; }
+  .handle span { display: block; width: 44px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto; }
+  .sheet-body { overflow-y: auto; padding: 2px 16px 18px; flex: 1; -webkit-overflow-scrolling: touch; }
+
+  .head { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: center; margin-bottom: 10px; }
+  .shield { width: 52px; height: 55px; }
+  .shield text { font-family: "Barlow Condensed", sans-serif; font-weight: 700; }
+  .head h2 { font-size: 1.6rem; line-height: 1.05; }
+  .head p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+  .summary { margin: 0 0 12px; }
+
+  .btn, button.btn {
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer;
+    border-radius: 999px; padding: 7px 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 0.92rem;
+  }
+  .btn.primary { background: var(--forest); color: #fff; border-color: var(--forest); }
+  .btn.danger { color: var(--shield-red); }
+  .btnrow { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .stops { list-style: none; margin: 0 0 14px; padding: 0; }
+  .stops li + li { border-top: 1px solid var(--line); }
+  .stops button {
+    width: 100%; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer;
+    display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 9px 2px; align-items: start;
+  }
+  .stops .ic { font-size: 1.15rem; text-align: center; }
+  .stops .k { color: var(--muted); font-size: 0.82rem; display: block; }
+  .stops .n { font-weight: 700; }
+  .stops li.done .n { text-decoration: line-through; }
+  .section-title { font-size: 1.15rem; margin: 14px 0 4px; color: var(--forest); }
+
+  .detail h2 { font-size: 1.6rem; margin-bottom: 2px; }
+  .detail .kind { color: var(--muted); margin: 0 0 8px; }
+  .detail .note { margin: 0 0 12px; }
+
+  form.add label { display: block; font-weight: 700; margin: 10px 0 4px; }
+  form.add input, form.add select, form.add textarea {
+    width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 10px; background: var(--bg); color: var(--ink);
+  }
+  form.add textarea { min-height: 70px; resize: vertical; }
+  .cats { display: flex; gap: 6px; flex-wrap: wrap; }
+  .cats button[aria-pressed="true"] { background: var(--mine); color: #fff; border-color: var(--mine); }
+  .formerror { color: var(--shield-red); margin: 6px 0 0; }
+
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 12px; }
+  .chips button[aria-pressed="false"] { opacity: 0.5; }
+  .chips .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .fineprint { color: var(--muted); font-size: 0.86rem; }
+
+  /* Map pins */
+  .pin { font-size: 20px; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,.4)); transition: opacity .15s; }
+  .pin.mine { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--mine); border: 2px solid #fff; }
+  .pin.mine span { transform: rotate(45deg); font-size: 15px; }
+  .dim { opacity: 0.25; }
+  .leaflet-top { top: calc(env(safe-area-inset-top, 0px) + 96px); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="map" aria-label="Trip map"></div>
+
+<header class="bar">
+  <div class="row"><h1>Road Trip 2027</h1><span class="status" id="status"></span></div>
+  <div class="days" id="days" aria-label="Choose a day"></div>
+</header>
+
+<button class="locate" id="locateBtn" aria-label="Show where I am">◎</button>
+<button class="fab" id="addBtn">+ Add a spot</button>
+
+<div class="crosshair" id="crosshair" hidden aria-hidden="true">📍</div>
+<div class="placebar" id="placebar" hidden>
+  <p>Move the map until the pin is on the spot.</p>
+  <div class="btnrow">
+    <button class="btn" id="cancelPlace">Cancel</button>
+    <button class="btn primary" id="confirmPlace">Put the pin here</button>
+  </div>
+</div>
+
+<section class="sheet" id="sheet" aria-label="Details">
+  <button class="handle" id="handle" aria-label="Expand or collapse details"><span></span></button>
+  <div class="sheet-body" id="sheetBody"></div>
+</section>
+
+<script src="data.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function () {
+  const T = window.TRIP, P = T.places;
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const WD = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const WEEKDAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const $ = id => document.getElementById(id);
+
+  // ---------- storage (this phone only) ----------
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem("rt27:" + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem("rt27:" + k, JSON.stringify(v)); } catch (e) {} }
+  };
+  let mine = store.get("mine", []);           // spots you add
+  let done = store.get("done", {});           // visited marks
+  let filters = store.get("filters2", { stay: true, ride: true, fun: true, meal: true, mine: true });
+
+  // ---------- dates ----------
+  const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const start = parse(T.start);
+  const todayDiff = () => { const n = new Date(); return Math.round((new Date(n.getFullYear(), n.getMonth(), n.getDate()) - start) / 86400000); };
+  const longDate = s => { const d = parse(s); return `${WEEKDAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`; };
+
+  // ---------- categories ----------
+  const KIND = {
+    camp: { label: "Campground", group: "stay", icon: "⛺" },
+    hotel: { label: "Hotel", group: "stay", icon: "🛏️" },
+    host: { label: "Staying with family or friends", group: "stay", icon: "🏡" },
+    home: { label: "Home", group: "stay", icon: "🏠" },
+    airport: { label: "Airport", group: "stay", icon: "✈️" },
+    ride: { label: "Riding", group: "ride", icon: "🚵" },
+    fun: { label: "Fun stop", group: "fun", icon: "🎉" },
+    meal: { label: "Scenic meal stop", group: "meal", icon: "🧺" }
+  };
+  const MY_CATS = {
+    fun: { label: "Fun stop", icon: "🎉" },
+    meal: { label: "Food", icon: "🍔" },
+    ride: { label: "Ride", icon: "🚵" },
+    stay: { label: "Place to sleep", icon: "⛺" },
+    gas: { label: "Gas or supplies", icon: "⛽" },
+    note: { label: "Note", icon: "📝" }
+  };
+  const GROUPS = {
+    stay: { label: "Sleep", color: "#2F5D3A" },
+    ride: { label: "Ride", color: "#D9621A" },
+    fun: { label: "Fun", color: "#7A4FA3" },
+    meal: { label: "Meals", color: "#A07614" },
+    mine: { label: "My spots", color: "#C2185B" }
+  };
+
+  // Which day each built-in place belongs to
+  const dayOf = {};
+  const dayPlaces = T.days.map((d, i) => {
+    const ids = [d.stay, ...(d.ride ? d.ride.places : []), ...(d.fun || []), ...((d.meals || []).map(m => m[1])), ...(d.extra || [])].filter(Boolean);
+    ids.forEach(id => { if (dayOf[id] === undefined) dayOf[id] = i; });
+    return ids;
+  });
+
+  // ---------- map ----------
+  const map = L.map("map", { zoomControl: false, tap: true });
+  L.control.zoom({ position: "topleft" }).addTo(map);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(map);
+  const routeLine = L.polyline(T.route, { color: "#1D4E89", weight: 4, opacity: 0.65 }).addTo(map);
+  const layers = {}; Object.keys(GROUPS).forEach(g => layers[g] = L.layerGroup().addTo(map));
+  const markers = {}; // id -> marker
+
+  function iconFor(p, isMine) {
+    if (isMine) {
+      const c = MY_CATS[p.cat] || MY_CATS.note;
+      return L.divIcon({ className: "", html: `<div class="pin mine"><span>${c.icon}</span></div>`, iconSize: [30, 30], iconAnchor: [15, 30] });
+    }
+    const emoji = p.emoji || (KIND[p.type] || {}).icon || "📍";
+    return L.divIcon({ className: "", html: `<div class="pin">${emoji}</div>`, iconSize: [24, 24], iconAnchor: [12, 12] });
+  }
+
+  function drawBuiltIns() {
+    Object.entries(P).forEach(([id, p]) => {
+      const k = KIND[p.type]; if (!k) return;
+      const m = L.marker([p.lat, p.lng], { icon: iconFor(p), keyboard: true, title: p.name });
+      m.on("click", () => showPlace(id));
+      m.addTo(layers[k.group]); markers[id] = m;
+    });
+  }
+  function drawMine() {
+    layers.mine.clearLayers();
+    mine.forEach(s => {
+      const m = L.marker([s.lat, s.lng], { icon: iconFor(s, true), title: s.name, keyboard: true });
+      m.on("click", () => showMine(s.id));
+      m.addTo(layers.mine); markers[s.id] = m;
+    });
+  }
+  function applyFilters() {
+    Object.keys(GROUPS).forEach(g => filters[g] ? layers[g].addTo(map) : map.removeLayer(layers[g]));
+  }
+
+  // Keep a point visible above the bottom sheet and below the top bar
+  function focusOn(lat, lng) {
+    const sheetH = document.body.classList.contains("sheet-open") ? window.innerHeight * 0.68 : 150;
+    const topH = document.querySelector(".bar").offsetHeight;
+    const targetY = (topH + (window.innerHeight - sheetH)) / 2;
+    map.panTo([lat, lng], { animate: false });
+    map.panBy([0, window.innerHeight / 2 - targetY], { animate: true });
+  }
+  const fitPad = () => ({ paddingTopLeft: [30, document.querySelector(".bar").offsetHeight + 30], paddingBottomRight: [30, 180] });
+
+  // ---------- day strip ----------
+  let selectedDay = null; // null = whole trip
+  function renderDays() {
+    const td = todayDiff();
+    let html = `<button data-day="all" aria-pressed="${selectedDay === null}"><b>All</b><small>trip</small></button>`;
+    T.days.forEach((d, i) => {
+      const dt = parse(d.date);
+      html += `<button data-day="${i}" aria-pressed="${selectedDay === i}" class="${i === td ? "today" : ""}">
+        <b>${i + 1}</b><small>${WD[dt.getDay()]} ${dt.getDate()}</small></button>`;
+    });
+    $("days").innerHTML = html;
+    const sel = $("days").querySelector('[aria-pressed="true"]');
+    if (sel) sel.scrollIntoView({ inline: "center", block: "nearest" });
+  }
+
+  function highlightDay() {
+    const ids = selectedDay === null ? null : new Set([...dayPlaces[selectedDay], ...mine.filter(s => s.day === selectedDay).map(s => s.id)]);
+    Object.entries(markers).forEach(([id, m]) => {
+      const el = m.getElement(); if (!el) return;
+      el.classList.toggle("dim", !!ids && !ids.has(id));
+    });
+  }
+
+  function selectDay(i, fly = true) {
+    selectedDay = i;
+    renderDays(); highlightDay(); showDay();
+    if (!fly) return;
+    if (i === null) { map.fitBounds(routeLine.getBounds(), fitPad()); return; }
+    const pts = [...dayPlaces[i].map(id => [P[id].lat, P[id].lng]), ...mine.filter(s => s.day === i).map(s => [s.lat, s.lng])];
+    const prev = i > 0 && T.days[i - 1].stay ? P[T.days[i - 1].stay] : null;
+    if (prev && T.days[i].drive) pts.push([prev.lat, prev.lng]);
+    if (pts.length) map.fitBounds(L.latLngBounds(pts), Object.assign(fitPad(), { maxZoom: 12 }));
+  }
+
+  // ---------- sheet ----------
+  const setOpen = open => document.body.classList.toggle("sheet-open", open);
+  $("handle").onclick = () => setOpen(!document.body.classList.contains("sheet-open"));
+
+  function shield(n) {
+    return `<svg class="shield" viewBox="0 0 84 88" aria-hidden="true">
+      <path d="M8 6 Q42 -2 76 6 Q84 46 42 86 Q0 46 8 6Z" fill="var(--road)" stroke="#fff" stroke-width="3"/>
+      <path d="M9.5 7.5 Q42 0 74.5 7.5 L75.5 22 H8.5Z" fill="var(--shield-red)"/>
+      <text x="42" y="18.5" text-anchor="middle" font-size="10" fill="#fff">DAY</text>
+      <text x="42" y="${n > 9 ? 60 : 62}" text-anchor="middle" font-size="${n > 9 ? 36 : 42}" fill="#fff">${n}</text></svg>`;
+  }
+  const dirUrl = p => `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
+
+  function stopItem(id, kindLabel) {
+    const p = P[id] || mine.find(s => s.id === id); if (!p) return "";
+    const isMine = !P[id];
+    const icon = isMine ? (MY_CATS[p.cat] || MY_CATS.note).icon : (p.emoji || (KIND[p.type] || {}).icon || "📍");
+    return `<li class="${done[id] ? "done" : ""}"><button data-stop="${id}"><span class="ic" aria-hidden="true">${icon}</span>
+      <span><span class="k">${esc(kindLabel)}</span><span class="n">${esc(p.name)}</span></span></button></li>`;
+  }
+
+  function showDay() {
+    const body = $("sheetBody");
+    if (selectedDay === null) {
+      const td = todayDiff();
+      const when = td < 0 ? `Starts in ${-td} days` : td >= T.days.length ? "Trip complete" : `Today is day ${td + 1}`;
+      body.innerHTML = `
+        <div class="head">${shield(T.days.length)}<div><h2>The whole trip</h2><p>${T.days.length} days, July 3 to 31 · ${when}</p></div></div>
+        <p class="summary">Pick a day at the top, tap any pin, or add your own spot with the pink button.</p>
+        <h3 class="section-title">Show on the map</h3>
+        <div class="chips">${Object.entries(GROUPS).map(([g, v]) =>
+          `<button class="btn" data-chip="${g}" aria-pressed="${filters[g]}"><span class="dot" style="background:${v.color}"></span>${v.label}</button>`).join("")}</div>
+        <h3 class="section-title">My spots (${mine.length})</h3>
+        ${mine.length ? `<ul class="stops">${mine.map(s => stopItem(s.id, s.day === null || s.day === undefined ? (MY_CATS[s.cat] || MY_CATS.note).label : `Day ${s.day + 1} · ${(MY_CATS[s.cat] || MY_CATS.note).label}`)).join("")}</ul>`
+          : `<p class="fineprint">Nothing added yet. Tap “+ Add a spot” to drop a pin anywhere on the map.</p>`}
+        <h3 class="section-title">Share my spots</h3>
+        <p class="fineprint">Spots are saved on this phone. To share them, export a file and import it on another phone.</p>
+        <div class="btnrow">
+          <button class="btn" id="exportBtn">Export my spots</button>
+          <label class="btn" for="importFile">Import spots</label>
+          <input type="file" id="importFile" accept="application/json,.json" hidden>
+        </div>`;
+      return;
+    }
+    const d = T.days[selectedDay];
+    const parts = [];
+    if (d.drive) parts.push(`<p class="summary">🚗 ${esc(d.drive.from)} to ${esc(d.drive.to)}, about ${d.drive.miles} miles and ${d.drive.hours} hours.</p>`);
+    if (d.note) parts.push(`<p class="summary">⚠️ ${esc(d.note)}</p>`);
+    const items = [];
+    if (d.ride) d.ride.places.forEach(id => items.push(stopItem(id, "Ride")));
+    (d.meals || []).forEach(([m, id]) => items.push(stopItem(id, m)));
+    (d.fun || []).forEach(id => items.push(stopItem(id, "Fun stop")));
+    (d.extra || []).forEach(id => items.push(stopItem(id, "Heads up")));
+    mine.filter(s => s.day === selectedDay).forEach(s => items.push(stopItem(s.id, "My spot")));
+    if (d.stay) items.push(stopItem(d.stay, "Tonight"));
+    $("sheetBody").innerHTML = `
+      <div class="head">${shield(selectedDay + 1)}<div><h2>${esc(d.title)}</h2><p>${longDate(d.date)}</p></div></div>
+      ${d.ride ? `<p class="summary">🚵 ${esc(d.ride.text)}</p>` : ""}
+      ${parts.join("")}
+      <ul class="stops">${items.join("")}</ul>
+      <div class="btnrow">
+        <button class="btn" data-nav="${selectedDay - 1}" ${selectedDay === 0 ? "disabled" : ""}>Previous day</button>
+        <button class="btn" data-nav="${selectedDay + 1}" ${selectedDay === T.days.length - 1 ? "disabled" : ""}>Next day</button>
+      </div>`;
+  }
+
+  function showPlace(id) {
+    const p = P[id]; const k = KIND[p.type] || {};
+    const di = dayOf[id];
+    const canVisit = p.type === "fun" || p.type === "meal";
+    $("sheetBody").innerHTML = `<div class="detail">
+      <h2>${p.emoji ? p.emoji + " " : ""}${esc(p.name)}</h2>
+      <p class="kind">${esc(k.label || "")}${di !== undefined ? ` · Day ${di + 1}, ${longDate(T.days[di].date)}` : ""}</p>
+      ${p.note ? `<p class="note">${esc(p.note)}</p>` : ""}
+      <div class="btnrow">
+        <a class="btn primary" href="${dirUrl(p)}" target="_blank" rel="noopener">Directions</a>
+        ${p.link ? `<a class="btn" href="${p.link}" target="_blank" rel="noopener">Trail info</a>` : ""}
+        ${canVisit ? `<button class="btn" data-visit="${id}">${done[id] ? "Visited ✓" : "Mark visited"}</button>` : ""}
+        ${di !== undefined ? `<button class="btn" data-goday="${di}">See day ${di + 1}</button>` : ""}
+      </div></div>`;
+    setOpen(true);
+    focusOn(p.lat, p.lng);
+  }
+
+  function showMine(id) {
+    const s = mine.find(x => x.id === id); if (!s) return;
+    const c = MY_CATS[s.cat] || MY_CATS.note;
+    $("sheetBody").innerHTML = `<div class="detail">
+      <h2>${c.icon} ${esc(s.name)}</h2>
+      <p class="kind">My spot · ${esc(c.label)}${s.day !== null && s.day !== undefined ? ` · Day ${s.day + 1}` : ""}</p>
+      ${s.note ? `<p class="note">${esc(s.note)}</p>` : ""}
+      <div class="btnrow">
+        <a class="btn primary" href="${dirUrl(s)}" target="_blank" rel="noopener">Directions</a>
+        <button class="btn" data-visit="${id}">${done[id] ? "Visited ✓" : "Mark visited"}</button>
+        <button class="btn" data-edit="${id}">Edit</button>
+        <button class="btn" data-move="${id}">Move pin</button>
+        <button class="btn danger" data-delete="${id}">Delete</button>
+      </div></div>`;
+    setOpen(true);
+    focusOn(s.lat, s.lng);
+  }
+
+  // ---------- adding spots ----------
+  let pending = null; // { lat, lng, editId, moveId }
+  function startPlacing(moveId) {
+    document.body.classList.add("adding"); setOpen(false);
+    $("crosshair").hidden = false; $("placebar").hidden = false;
+    pending = { moveId: moveId || null };
+  }
+  function stopPlacing() {
+    document.body.classList.remove("adding");
+    $("crosshair").hidden = true; $("placebar").hidden = true;
+  }
+  $("addBtn").onclick = () => startPlacing();
+  $("cancelPlace").onclick = () => { stopPlacing(); pending = null; };
+  $("confirmPlace").onclick = () => {
+    // The crosshair's tip sits at the screen center
+    const c = map.getCenter();
+    stopPlacing();
+    if (pending && pending.moveId) {
+      const s = mine.find(x => x.id === pending.moveId);
+      if (s) { s.lat = c.lat; s.lng = c.lng; saveMine(); showMine(s.id); }
+      pending = null; return;
+    }
+    showForm({ lat: c.lat, lng: c.lng, name: "", cat: "fun", day: selectedDay, note: "" });
+  };
+
+  function showForm(s) {
+    const isEdit = !!s.id;
+    $("sheetBody").innerHTML = `<form class="add" id="addForm" novalidate>
+      <h2>${isEdit ? "Edit spot" : "New spot"}</h2>
+      <label for="fName">Name</label>
+      <input id="fName" maxlength="80" value="${esc(s.name)}" placeholder="For example, giant fiberglass cow" autocomplete="off">
+      <label>Type</label>
+      <div class="cats" id="fCats">${Object.entries(MY_CATS).map(([k, c]) =>
+        `<button type="button" class="btn" data-cat="${k}" aria-pressed="${s.cat === k}">${c.icon} ${c.label}</button>`).join("")}</div>
+      <label for="fDay">Day</label>
+      <select id="fDay"><option value="">Any day</option>${T.days.map((d, i) =>
+        `<option value="${i}" ${s.day === i ? "selected" : ""}>Day ${i + 1}: ${longDate(d.date)}</option>`).join("")}</select>
+      <label for="fNote">Note</label>
+      <textarea id="fNote" maxlength="400" placeholder="Hours, what to order, why it’s worth stopping">${esc(s.note)}</textarea>
+      <p class="formerror" id="fErr" hidden>Give the spot a name.</p>
+      <div class="btnrow" style="margin-top:12px">
+        <button type="button" class="btn" id="fCancel">Cancel</button>
+        <button type="submit" class="btn primary">${isEdit ? "Save changes" : "Save spot"}</button>
+      </div></form>`;
+    setOpen(true);
+    let cat = s.cat;
+    $("fCats").onclick = e => {
+      const b = e.target.closest("[data-cat]"); if (!b) return;
+      cat = b.dataset.cat;
+      $("fCats").querySelectorAll("[data-cat]").forEach(x => x.setAttribute("aria-pressed", x === b));
+    };
+    $("fCancel").onclick = () => isEdit ? showMine(s.id) : showDay();
+    $("addForm").onsubmit = e => {
+      e.preventDefault();
+      const name = $("fName").value.trim();
+      if (!name) { $("fErr").hidden = false; $("fName").focus(); return; }
+      const dayVal = $("fDay").value;
+      const rec = { id: s.id || "u" + Date.now(), name, cat, day: dayVal === "" ? null : Number(dayVal), note: $("fNote").value.trim(), lat: s.lat, lng: s.lng };
+      if (isEdit) mine = mine.map(x => x.id === s.id ? rec : x); else mine.push(rec);
+      saveMine(); showMine(rec.id);
+    };
+    if (!isEdit) setTimeout(() => $("fName").focus(), 250);
+  }
+
+  function saveMine() { store.set("mine", mine); drawMine(); applyFilters(); highlightDay(); }
+
+  // ---------- export / import ----------
+  function exportMine() {
+    const blob = new Blob([JSON.stringify({ app: "road-trip-2027", spots: mine }, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "my-trip-spots.json"; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+  function importMine(file) {
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const data = JSON.parse(r.result);
+        const spots = Array.isArray(data) ? data : data.spots;
+        if (!Array.isArray(spots)) throw new Error();
+        let added = 0;
+        spots.forEach(s => {
+          if (typeof s.lat !== "number" || typeof s.lng !== "number" || !s.name) return;
+          if (mine.some(x => x.id === s.id)) return;
+          mine.push({ id: s.id || "u" + Date.now() + added, name: String(s.name).slice(0, 80), cat: MY_CATS[s.cat] ? s.cat : "note",
+            day: Number.isInteger(s.day) ? s.day : null, note: String(s.note || "").slice(0, 400), lat: s.lat, lng: s.lng });
+          added++;
+        });
+        saveMine(); showDay();
+        alert(added ? `Imported ${added} spot${added === 1 ? "" : "s"}.` : "No new spots in that file.");
+      } catch (e) { alert("That file isn’t a spots export from this app."); }
+    };
+    r.readAsText(file);
+  }
+
+  // ---------- locate ----------
+  let meMarker = null;
+  $("locateBtn").onclick = () => {
+    if (!navigator.geolocation) { alert("This browser can’t share your location."); return; }
+    navigator.geolocation.getCurrentPosition(pos => {
+      const ll = [pos.coords.latitude, pos.coords.longitude];
+      if (meMarker) meMarker.setLatLng(ll);
+      else meMarker = L.circleMarker(ll, { radius: 8, color: "#fff", weight: 3, fillColor: "#1D4E89", fillOpacity: 1 }).addTo(map);
+      map.setView(ll, 12);
+    }, () => alert("Location is off. Turn it on in your phone’s settings to see where you are."), { enableHighAccuracy: true, timeout: 10000 });
+  };
+
+  // ---------- events ----------
+  $("days").onclick = e => {
+    const b = e.target.closest("[data-day]"); if (!b) return;
+    selectDay(b.dataset.day === "all" ? null : Number(b.dataset.day));
+  };
+  document.addEventListener("click", e => {
+    const t = e.target;
+    const stop = t.closest("[data-stop]");
+    if (stop) { const id = stop.dataset.stop; P[id] ? showPlace(id) : showMine(id); return; }
+    const nav = t.closest("[data-nav]"); if (nav) { selectDay(Number(nav.dataset.nav)); return; }
+    const gd = t.closest("[data-goday]"); if (gd) { selectDay(Number(gd.dataset.goday)); return; }
+    const v = t.closest("[data-visit]");
+    if (v) { const id = v.dataset.visit; done[id] = !done[id]; store.set("done", done); v.textContent = done[id] ? "Visited ✓" : "Mark visited"; return; }
+    const ed = t.closest("[data-edit]"); if (ed) { showForm(mine.find(x => x.id === ed.dataset.edit)); return; }
+    const mv = t.closest("[data-move]");
+    if (mv) { const s = mine.find(x => x.id === mv.dataset.move); map.setView([s.lat, s.lng], Math.max(map.getZoom(), 13)); startPlacing(s.id); return; }
+    const del = t.closest("[data-delete]");
+    if (del) {
+      const s = mine.find(x => x.id === del.dataset.delete);
+      if (s && confirm(`Delete “${s.name}”?`)) { mine = mine.filter(x => x.id !== s.id); delete markers[s.id]; saveMine(); showDay(); setOpen(false); }
+      return;
+    }
+    const chip = t.closest("[data-chip]");
+    if (chip) { const g = chip.dataset.chip; filters[g] = !filters[g]; store.set("filters2", filters); chip.setAttribute("aria-pressed", filters[g]); applyFilters(); return; }
+    if (t.id === "exportBtn") { exportMine(); return; }
+  });
+  document.addEventListener("change", e => { if (e.target.id === "importFile" && e.target.files[0]) importMine(e.target.files[0]); });
+  map.on("click", () => { if (!document.body.classList.contains("adding")) setOpen(false); });
+
+  // ---------- status + start ----------
+  const td = todayDiff();
+  $("status").textContent = td < 0 ? `${-td} days to go` : td >= T.days.length ? "Trip complete" : `Day ${td + 1} of ${T.days.length}`;
+  drawBuiltIns(); drawMine(); applyFilters();
+  map.fitBounds(routeLine.getBounds(), fitPad());
+  const startDay = td >= 0 && td < T.days.length ? td : null;
+  selectDay(startDay, startDay !== null);
+})();
+</script>
+</body>
+</html>
