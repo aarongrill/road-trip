@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#2F5D3A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Road Trip 2027</title>
+<!-- App version 13 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
@@ -313,9 +314,9 @@
   <div class="sheet-body" id="sheetBody"></div>
 </section>
 
-<script src="config.js?v=12"></script>
-<script src="data.js?v=12"></script>
-<script src="route-geometry.js?v=12" onerror="window.ROUTE_GEOMETRY = null"></script>
+<script src="config.js?v=13"></script>
+<script src="data.js?v=13"></script>
+<script src="route-geometry.js?v=13" onerror="window.ROUTE_GEOMETRY = null"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function () {
@@ -713,6 +714,7 @@
         <h3 class="section-title">My spots (${mine.length})</h3>
         ${mine.length ? `<ul class="stops">${mine.map(s => stopItem(s.id, s.day === null || s.day === undefined ? (MY_CATS[s.cat] || MY_CATS.note).label : `Day ${s.day + 1} · ${(MY_CATS[s.cat] || MY_CATS.note).label}`)).join("")}</ul>`
           : `<p class="fineprint">Nothing added yet. Tap “+ Add a spot” to drop a pin anywhere on the map.</p>`}
+        <p class="fineprint">App version 13 (side-by-side map and links)</p>
         <h3 class="section-title">Share my spots</h3>
         <p class="fineprint">Spots are saved on this phone. To share them, export a file and import it on another phone.</p>
         <div class="btnrow">
@@ -1341,6 +1343,6 @@
   if (mode === "list" && startDay !== null) scrollToDay(startDay);
 })();
 </script>
-<script type="module" src="sync.js?v=12"></script>
+<script type="module" src="sync.js?v=13"></script>
 </body>
 </html>
