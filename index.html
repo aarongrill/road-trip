@@ -147,16 +147,16 @@
   .pin.mine { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--mine); border: 2px solid #fff; }
   .pin.mine span { transform: rotate(45deg); font-size: 15px; }
   .dim { opacity: 0.25; }
-  .leaflet-top { top: calc(env(safe-area-inset-top, 0px) + 96px); }
+  .leaflet-top { top: calc(var(--bar-h, 150px) + 6px); }
 
 
   /* View modes */
   .bar .row { gap: 10px; align-items: center; }
   .bar .row h1 { flex: 1; }
-  .modes { display: inline-flex; background: rgba(255,255,255,.15); border-radius: 999px; padding: 3px; }
-  .modes button { border: 0; background: transparent; color: #fff; border-radius: 999px; padding: 5px 14px; cursor: pointer; font-weight: 700; }
+  .modes { display: grid; grid-template-columns: repeat(3, 1fr); background: rgba(255,255,255,.15); border-radius: 12px; padding: 3px; margin: 2px 10px 4px; }
+  .modes button { border: 0; background: transparent; color: #fff; border-radius: 9px; padding: 7px 6px; cursor: pointer; font-weight: 700; font-size: 1rem; }
   .modes button[aria-pressed="true"] { background: #fff; color: var(--forest); }
-  @media (max-width: 420px) { .bar .status { display: none; } }
+  
   #listView { position: fixed; inset: 0; z-index: 450; overflow-y: auto; background: var(--bg);
     padding: calc(var(--bar-h, 110px) + 12px) 0 calc(28px + env(safe-area-inset-bottom, 0px)); -webkit-overflow-scrolling: touch; }
   body.mode-list #map, body.mode-list .fab, body.mode-list .locate, body.mode-list .sheet, body.mode-list .crosshair, body.mode-list .placebar,
@@ -213,8 +213,8 @@
 <div id="ideasView" aria-label="Ideas and votes"></div>
 
 <header class="bar">
-  <div class="row"><h1>Road Trip 2027</h1><span class="status" id="status"></span>
-    <div class="modes" role="group" aria-label="View"><button data-mode="list" aria-pressed="true">List</button><button data-mode="map" aria-pressed="false">Map</button><button data-mode="ideas" aria-pressed="false">Ideas</button></div></div>
+  <div class="row"><h1>Road Trip 2027</h1><span class="status" id="status"></span></div>
+  <div class="modes" role="group" aria-label="Choose a view"><button data-mode="map" aria-pressed="true"><span aria-hidden="true">🗺️</span> Map</button><button data-mode="list" aria-pressed="false"><span aria-hidden="true">📋</span> List</button><button data-mode="ideas" aria-pressed="false"><span aria-hidden="true">💡</span> Ideas</button></div>
   <div class="days" id="days" aria-label="Choose a day"></div>
 </header>
 
@@ -235,8 +235,9 @@
   <div class="sheet-body" id="sheetBody"></div>
 </section>
 
-<script src="config.js"></script>
-<script src="data.js"></script>
+<script src="config.js?v=5"></script>
+<script src="data.js?v=5"></script>
+<script src="route-geometry.js?v=5" onerror="window.ROUTE_GEOMETRY = null"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function () {
@@ -310,7 +311,38 @@
   const map = L.map("map", { zoomControl: false, tap: true });
   L.control.zoom({ position: "topleft" }).addTo(map);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(map);
-  const routeLine = L.polyline(T.route, { color: "#1D4E89", weight: 4, opacity: 0.65 }).addTo(map);
+  const routeLine = L.polyline(T.route, { color: "#1D4E89", weight: 4, opacity: 0.65, dashArray: "6 8" }).addTo(map);
+  loadRoadRoute();
+
+  // Make the route line follow real roads.
+  // 1) Use route-geometry.js if it was built (see README).
+  // 2) Otherwise use a copy saved on this phone.
+  // 3) Otherwise ask the free OSRM routing service once, then save the result.
+  async function loadRoadRoute() {
+    const KEY = "roadgeom:" + T.route.length + ":" + T.route[1].join(",");
+    const apply = pts => { if (pts && pts.length > 10) { routeLine.setLatLngs(pts); routeLine.setStyle({ dashArray: null, opacity: 0.75 }); } };
+    if (Array.isArray(window.ROUTE_GEOMETRY) && window.ROUTE_GEOMETRY.length) { apply(window.ROUTE_GEOMETRY); return; }
+    const cached = store.get(KEY, null);
+    if (cached) { apply(cached); return; }
+    try {
+      const pts = [];
+      const CHUNK = 25;
+      for (let i = 0; i < T.route.length - 1; i += CHUNK - 1) {
+        const part = T.route.slice(i, i + CHUNK);
+        const coords = part.map(([lat, lng]) => `${lng.toFixed(5)},${lat.toFixed(5)}`).join(";");
+        const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=simplified&geometries=geojson`);
+        if (!res.ok) throw new Error("routing " + res.status);
+        const data = await res.json();
+        if (data.code !== "Ok") throw new Error(data.code);
+        data.routes[0].geometry.coordinates.forEach(([lng, lat]) => pts.push([+lat.toFixed(4), +lng.toFixed(4)]));
+        await new Promise(r => setTimeout(r, 1100)); // be polite to the free service
+      }
+      store.set(KEY, pts);
+      apply(pts);
+    } catch (e) {
+      console.warn("Road route unavailable; showing the approximate line", e);
+    }
+  }
   const layers = {}; Object.keys(GROUPS).forEach(g => layers[g] = L.layerGroup().addTo(map));
   const markers = {}; // id -> marker
 
@@ -719,7 +751,7 @@
   }
 
   // ---------- list mode ----------
-  let mode = store.get("mode", "list");
+  let mode = store.get("mode2", "map");
   const legName = i => (i <= 7 ? "Leg 1: Home to Dillon" : i <= 22 ? "Leg 2: Dillon to Big Sky" : "Leg 3: Big Sky to home");
 
   function prow(id, label, opts = {}) {
@@ -782,7 +814,7 @@
   function setBarHeight() { document.documentElement.style.setProperty("--bar-h", document.querySelector(".bar").offsetHeight + "px"); }
 
   function setMode(m) {
-    mode = m; store.set("mode", m);
+    mode = m; store.set("mode2", m);
     document.body.classList.toggle("mode-list", m === "list");
     document.body.classList.toggle("mode-map", m === "map");
     document.body.classList.toggle("mode-ideas", m === "ideas");
@@ -890,6 +922,6 @@
   if (mode === "list" && startDay !== null) scrollToDay(startDay);
 })();
 </script>
-<script type="module" src="sync.js"></script>
+<script type="module" src="sync.js?v=5"></script>
 </body>
 </html>

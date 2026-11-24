@@ -1,19 +1,19 @@
 # Road Trip 2027
 
-A phone-friendly companion app for our July 2027 mountain bike road trip. Switch between three views with the buttons at the top: List, Map, and Ideas.
+A phone-friendly companion app for our July 2027 mountain bike road trip. Switch between three views with the Map, List, and Ideas buttons under the title. The app opens on the map.
 
 ## The three views
-
-**List**
-- Every day of the trip, grouped by leg. Tap a day to expand it and see the drive, rides, meal stop, fun stops, stops the family added, and where we're sleeping.
-- Each stop has Directions, Show on map, and Trail info buttons, plus "Mark visited."
-- During the trip, today is highlighted and opens automatically.
 
 **Map**
 - A full-screen map you can scroll and zoom. Tap a day at the top to zoom to its stops, or "All" for the whole route.
 - Tap any pin for details. Teal circle pins are ideas you can vote on.
 - **+ Add a spot**: move the map until the pin is on the spot, tap "Put the pin here," then name it, pick a type, and attach it to a day.
 - The ◎ button shows where you are.
+
+**List**
+- Every day of the trip, grouped by leg. Tap a day to expand it and see the drive, rides, meal stop, fun stops, stops the family added, and where we're sleeping.
+- Each stop has Directions, Show on map, and Trail info buttons, plus "Mark visited."
+- During the trip, today is highlighted and opens automatically.
 
 **Ideas**
 - Researched options along the route: fun places to eat, odd roadside stops, and views and rest stops, each with the day it fits, the detour, and details.
@@ -31,6 +31,7 @@ Upload all five files to the top level of the repo:
 - `config.js`: settings for sharing votes and spots (see below)
 - `sync.js`: the code that shares votes and spots when sharing is turned on
 - `README.md`: this file
+- `tools/build-route.mjs`: optional script that builds `route-geometry.js` (see "Route along real roads")
 
 ## Publish on GitHub Pages
 
@@ -38,6 +39,18 @@ Upload all five files to the top level of the repo:
 2. Go to Settings > Pages. Set Source to "Deploy from a branch," pick `main` and `/ (root)`, and save.
 3. For a custom domain, enter it under Settings > Pages > Custom domain, then add the DNS records GitHub lists.
 4. Once the domain works, check "Enforce HTTPS." The ◎ location button only works over HTTPS.
+
+## Route along real roads
+
+The blue route line follows the actual highways. The first time someone opens the map, the app asks OSRM, a free routing service built on OpenStreetMap, for the road route and saves it on that phone. Until then, or if the service is busy, the map shows a dashed approximate line.
+
+For the most reliable result, build the road route once and upload it, so phones never need to call the routing service:
+
+1. Install Node.js 18 or newer on your computer.
+2. In a folder with `data.js` and the `tools` folder, run `node tools/build-route.mjs`.
+3. Upload the new `route-geometry.js` file to the repo.
+
+Run it again whenever you change the `route` list in `data.js`. To steer the line onto a particular road, add a point on that road to `route` in driving order.
 
 ## Share votes and spots with the family
 
@@ -79,5 +92,6 @@ A GitHub Pages site is public to anyone with the link, and a public repository s
 ## Notes
 
 - The map uses OpenStreetMap tiles and the Leaflet library, so it needs a data connection.
+- After uploading new files, refresh the page. If a phone still shows the old version, close the tab and open the site again.
 - Drive times, distances, coordinates, and hours are approximate. Check each idea's hours before you go; some details came from travel guides and may have changed.
 - Parts of this app and its data were drafted with AI assistance, so double-check details before relying on them.
