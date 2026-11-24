@@ -4,15 +4,22 @@ A phone-friendly companion app for our July 2027 mountain bike road trip. It sho
 
 ## What's in it
 
-The whole app is a map you can scroll and zoom with your fingers.
+Switch between two views with the List and Map buttons at the top. The app remembers which one you used last.
 
-- **Day strip** at the top: tap a day to zoom to its stops. Tap "All" for the whole trip. During the trip it opens to today.
-- **Pins** for every ride, fun stop, meal spot, and place to sleep. Tap one for details, directions, and trail info.
+**List view**
+- Every day of the trip, grouped by leg. Tap a day to expand it and see the drive, rides, meal stop, fun stops, your own spots, and where you're sleeping.
+- Each stop has Directions, Show on map, and Trail info buttons, plus "Mark visited" for fun stops and meal spots.
+- Expand all or Collapse all at the top. During the trip, today is highlighted and opens automatically.
+
+**Map view**
+- A full-screen map you can scroll and zoom. Tap a day at the top to zoom to its stops, or "All" for the whole route.
+- Tap any pin for details, directions, and trail info.
 - **+ Add a spot**: move the map until the pin is on the spot, tap "Put the pin here," then name it, pick a type, and attach it to a day. Your spots can be edited, moved, or deleted.
-- **◎ button**: shows where you are (the phone will ask for location permission).
-- **Bottom panel**: swipe or tap the handle to open it. It lists the day's plan, your spots, and map filters.
+- The ◎ button shows where you are.
 
-Spots you add and "visited" marks are saved on that phone only. To share spots with someone else, use "Export my spots" on one phone and "Import spots" on the other.
+The day strip at the top works in both views: in the list it jumps to that day.
+
+Spots you add and "visited" marks are saved on that phone only. To share spots, use "Export my spots" on one phone (Map view, "All," then open the bottom panel) and "Import spots" on the other.
 
 ## Files
 

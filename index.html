@@ -149,14 +149,53 @@
   .dim { opacity: 0.25; }
   .leaflet-top { top: calc(env(safe-area-inset-top, 0px) + 96px); }
 
+
+  /* View modes */
+  .bar .row { gap: 10px; align-items: center; }
+  .bar .row h1 { flex: 1; }
+  .modes { display: inline-flex; background: rgba(255,255,255,.15); border-radius: 999px; padding: 3px; }
+  .modes button { border: 0; background: transparent; color: #fff; border-radius: 999px; padding: 5px 14px; cursor: pointer; font-weight: 700; }
+  .modes button[aria-pressed="true"] { background: #fff; color: var(--forest); }
+  @media (max-width: 420px) { .bar .status { display: none; } }
+  #listView { position: fixed; inset: 0; z-index: 450; overflow-y: auto; background: var(--bg);
+    padding: calc(var(--bar-h, 110px) + 12px) 0 calc(28px + env(safe-area-inset-bottom, 0px)); -webkit-overflow-scrolling: touch; }
+  body.mode-list #map, body.mode-list .fab, body.mode-list .locate, body.mode-list .sheet, body.mode-list .crosshair, body.mode-list .placebar { display: none !important; }
+  body.mode-map #listView { display: none; }
+  .listwrap { max-width: 720px; margin: 0 auto; padding: 0 14px; }
+  .listtools { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .listtools .btn.add { background: var(--mine); color: #fff; border-color: var(--mine); }
+  .legtitle { font-size: 1.35rem; color: var(--forest); margin: 20px 0 8px; }
+  details.dayc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 8px; scroll-margin-top: calc(var(--bar-h, 110px) + 10px); }
+  details.dayc.today { border-color: var(--blaze); box-shadow: inset 4px 0 0 var(--blaze); }
+  details.dayc > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; }
+  details.dayc > summary::-webkit-details-marker { display: none; }
+  details.dayc > summary .shield { width: 40px; height: 42px; }
+  details.dayc > summary .t { font-weight: 700; display: block; font-size: 1.05rem; }
+  details.dayc > summary .d { color: var(--muted); font-size: 0.88rem; }
+  details.dayc > summary .tags { color: var(--muted); font-size: 0.88rem; text-align: right; white-space: nowrap; }
+  details.dayc > summary .tags::after { content: "▾"; display: inline-block; margin-left: 8px; transition: transform .15s; }
+  details.dayc[open] > summary .tags::after { transform: rotate(180deg); }
+  .dbody { padding: 2px 14px 14px; border-top: 1px solid var(--line); }
+  .blk { border-left: 4px solid var(--c, var(--line)); padding: 2px 0 2px 12px; margin-top: 14px; }
+  .blk h3 { font-size: 1.1rem; color: var(--c); margin-bottom: 4px; }
+  .blk.drive { --c: var(--road); } .blk.ride { --c: var(--blaze); } .blk.stay { --c: var(--forest); }
+  .blk.fun { --c: var(--fun); } .blk.meal { --c: var(--meal); } .blk.note { --c: var(--muted); } .blk.mine { --c: var(--mine); }
+  .blk p { margin: 0; }
+  .prow { padding: 8px 0; border-top: 1px solid var(--line); }
+  .prow:first-of-type { border-top: 0; }
+  .prow .pn { font-weight: 700; }
+  .prow .pnote { color: var(--muted); margin: 2px 0 6px; font-size: 0.94rem; }
+  .prow.visited .pn { text-decoration: line-through; }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
 <div id="map" aria-label="Trip map"></div>
+<div id="listView" aria-label="Trip list"></div>
 
 <header class="bar">
-  <div class="row"><h1>Road Trip 2027</h1><span class="status" id="status"></span></div>
+  <div class="row"><h1>Road Trip 2027</h1><span class="status" id="status"></span>
+    <div class="modes" role="group" aria-label="View"><button data-mode="list" aria-pressed="true">List</button><button data-mode="map" aria-pressed="false">Map</button></div></div>
   <div class="days" id="days" aria-label="Choose a day"></div>
 </header>
 
@@ -528,20 +567,113 @@
     }, () => alert("Location is off. Turn it on in your phone’s settings to see where you are."), { enableHighAccuracy: true, timeout: 10000 });
   };
 
+
+  // ---------- list mode ----------
+  let mode = store.get("mode", "list");
+  const legName = i => (i <= 7 ? "Leg 1: Home to Dillon" : i <= 22 ? "Leg 2: Dillon to Big Sky" : "Leg 3: Big Sky to home");
+
+  function prow(id, label, opts = {}) {
+    const p = P[id] || mine.find(s => s.id === id); if (!p) return "";
+    const isMine = !P[id];
+    const icon = isMine ? (MY_CATS[p.cat] || MY_CATS.note).icon : (p.emoji || "");
+    const canVisit = isMine || p.type === "fun" || p.type === "meal";
+    return `<div class="prow ${done[id] ? "visited" : ""}">
+      <div class="pn">${icon ? icon + " " : ""}${label ? esc(label) + ": " : ""}${esc(p.name)}</div>
+      ${p.note ? `<p class="pnote">${esc(p.note)}</p>` : ""}
+      <div class="btnrow">
+        <a class="btn" href="${dirUrl(p)}" target="_blank" rel="noopener">Directions</a>
+        <button class="btn" data-showmap="${id}">Show on map</button>
+        ${p.link ? `<a class="btn" href="${p.link}" target="_blank" rel="noopener">Trail info</a>` : ""}
+        ${canVisit ? `<button class="btn" data-visit="${id}">${done[id] ? "Visited ✓" : "Mark visited"}</button>` : ""}
+        ${isMine ? `<button class="btn" data-edit="${id}">Edit</button>` : ""}
+      </div></div>`;
+  }
+
+  function dayBody(d, i) {
+    const out = [];
+    if (d.drive) out.push(`<div class="blk drive"><h3>Drive</h3><p>${esc(d.drive.from)} to ${esc(d.drive.to)}, about ${d.drive.miles} miles and ${d.drive.hours} hours</p></div>`);
+    if (d.ride) out.push(`<div class="blk ride"><h3>Ride</h3><p class="pnote">${esc(d.ride.text)}</p>${d.ride.places.map(id => prow(id)).join("")}</div>`);
+    if (d.note || d.extra) out.push(`<div class="blk note"><h3>Heads up</h3>${d.note ? `<p>${esc(d.note)}</p>` : ""}${(d.extra || []).map(id => prow(id)).join("")}</div>`);
+    if (d.meals) out.push(`<div class="blk meal"><h3>Scenic meal stop</h3>${d.meals.map(([m, id]) => prow(id, m)).join("")}</div>`);
+    if (d.fun) out.push(`<div class="blk fun"><h3>Fun stops</h3>${d.fun.map(id => prow(id)).join("")}</div>`);
+    const my = mine.filter(s => s.day === i);
+    if (my.length) out.push(`<div class="blk mine"><h3>My spots</h3>${my.map(s => prow(s.id)).join("")}</div>`);
+    if (d.stay) out.push(`<div class="blk stay"><h3>Tonight</h3>${prow(d.stay)}</div>`);
+    return out.join("");
+  }
+
+  function renderList(openIdx) {
+    const td = todayDiff();
+    const openSet = new Set([...document.querySelectorAll("details.dayc[open]")].map(el => Number(el.dataset.i)));
+    if (openIdx !== undefined) openSet.add(openIdx);
+    if (!document.querySelector("details.dayc") && openIdx === undefined) openSet.add(td >= 0 && td < T.days.length ? td : 0);
+    let html = `<div class="listwrap"><div class="listtools">
+      <button class="btn" data-expand="all">Expand all</button>
+      <button class="btn" data-expand="none">Collapse all</button>
+      <button class="btn add" data-addspot="1">+ Add a spot</button></div>`;
+    let lastLeg = "";
+    T.days.forEach((d, i) => {
+      const leg = legName(i);
+      if (leg !== lastLeg) { html += `<h2 class="legtitle">${leg}</h2>`; lastLeg = leg; }
+      const myCount = mine.filter(s => s.day === i).length;
+      const tags = [d.ride ? "🚵" : "", d.drive ? `🚗 ${d.drive.miles} mi` : "", myCount ? `📌 ${myCount}` : ""].filter(Boolean).join(" ");
+      html += `<details class="dayc ${i === td ? "today" : ""}" id="day-${i}" data-i="${i}" ${openSet.has(i) ? "open" : ""}>
+        <summary>${shield(i + 1)}<span><span class="t">${esc(d.title)}</span><span class="d">${longDate(d.date)}</span></span><span class="tags">${tags}</span></summary>
+        <div class="dbody">${dayBody(d, i)}</div></details>`;
+    });
+    const loose = mine.filter(s => s.day === null || s.day === undefined);
+    html += `<h2 class="legtitle">My spots without a day (${loose.length})</h2>`;
+    html += loose.length ? `<div class="dayc" style="padding:4px 14px">${loose.map(s => prow(s.id)).join("")}</div>`
+      : `<p class="fineprint">Spots you add without picking a day show up here.</p>`;
+    html += `</div>`;
+    $("listView").innerHTML = html;
+  }
+
+  function setBarHeight() { document.documentElement.style.setProperty("--bar-h", document.querySelector(".bar").offsetHeight + "px"); }
+
+  function setMode(m) {
+    mode = m; store.set("mode", m);
+    document.body.classList.toggle("mode-list", m === "list");
+    document.body.classList.toggle("mode-map", m === "map");
+    document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === m));
+    if (m === "list") renderList();
+    else { setTimeout(() => { map.invalidateSize(); highlightDay(); }, 0); }
+  }
+
+  function scrollToDay(i) {
+    renderList(i);
+    const el = $("day-" + i); if (el) { el.open = true; el.scrollIntoView({ block: "start" }); }
+  }
+
   // ---------- events ----------
   $("days").onclick = e => {
     const b = e.target.closest("[data-day]"); if (!b) return;
-    selectDay(b.dataset.day === "all" ? null : Number(b.dataset.day));
+    const di = b.dataset.day === "all" ? null : Number(b.dataset.day);
+    if (mode === "list") { selectedDay = di; renderDays(); if (di === null) $("listView").scrollTo({ top: 0 }); else scrollToDay(di); return; }
+    selectDay(di);
   };
   document.addEventListener("click", e => {
     const t = e.target;
+    const mb = t.closest("[data-mode]"); if (mb) { setMode(mb.dataset.mode); return; }
+    const ex = t.closest("[data-expand]");
+    if (ex) { document.querySelectorAll("details.dayc").forEach(d => d.open = ex.dataset.expand === "all"); return; }
+    const sm = t.closest("[data-showmap]");
+    if (sm) {
+      const id = sm.dataset.showmap; const p = P[id] || mine.find(s => s.id === id);
+      const di = P[id] ? dayOf[id] : p.day;
+      setMode("map");
+      setTimeout(() => { selectDay(di === undefined ? null : di, false); P[id] ? showPlace(id) : showMine(id); map.setView([p.lat, p.lng], Math.max(map.getZoom(), 11)); focusOn(p.lat, p.lng); }, 30);
+      return;
+    }
+    if (t.closest("[data-addspot]")) { setMode("map"); setTimeout(() => startPlacing(), 30); return; }
     const stop = t.closest("[data-stop]");
     if (stop) { const id = stop.dataset.stop; P[id] ? showPlace(id) : showMine(id); return; }
     const nav = t.closest("[data-nav]"); if (nav) { selectDay(Number(nav.dataset.nav)); return; }
     const gd = t.closest("[data-goday]"); if (gd) { selectDay(Number(gd.dataset.goday)); return; }
     const v = t.closest("[data-visit]");
-    if (v) { const id = v.dataset.visit; done[id] = !done[id]; store.set("done", done); v.textContent = done[id] ? "Visited ✓" : "Mark visited"; return; }
-    const ed = t.closest("[data-edit]"); if (ed) { showForm(mine.find(x => x.id === ed.dataset.edit)); return; }
+    if (v) { const id = v.dataset.visit; done[id] = !done[id]; store.set("done", done); v.textContent = done[id] ? "Visited ✓" : "Mark visited"; const row = v.closest(".prow"); if (row) row.classList.toggle("visited", !!done[id]); return; }
+    const ed = t.closest("[data-edit]");
+    if (ed) { const s = mine.find(x => x.id === ed.dataset.edit); if (mode === "list") setMode("map"); setTimeout(() => showForm(s), 30); return; }
     const mv = t.closest("[data-move]");
     if (mv) { const s = mine.find(x => x.id === mv.dataset.move); map.setView([s.lat, s.lng], Math.max(map.getZoom(), 13)); startPlacing(s.id); return; }
     const del = t.closest("[data-delete]");
@@ -564,6 +696,9 @@
   map.fitBounds(routeLine.getBounds(), fitPad());
   const startDay = td >= 0 && td < T.days.length ? td : null;
   selectDay(startDay, startDay !== null);
+  setBarHeight(); window.addEventListener("resize", setBarHeight);
+  setMode(mode);
+  if (mode === "list" && startDay !== null) scrollToDay(startDay);
 })();
 </script>
 </body>
